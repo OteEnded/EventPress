@@ -46,3 +46,27 @@ package-lock.json
 # vscode
 .vscode
 .history
+
+# Other editors/IDEs
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Log files
+*.log
+
+# macOS
+*.AppleDouble
+*.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
