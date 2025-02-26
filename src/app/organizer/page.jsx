@@ -1,6 +1,6 @@
 
 
-export default function OrganizerPage() {
+export default async function OrganizerPage() {
   return (
     <html>
         <head>
