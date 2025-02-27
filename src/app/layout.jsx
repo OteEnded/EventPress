@@ -2,15 +2,16 @@ import { ThemeProvider } from "../ui/providers/ThemeProvider"; // Import ThemePr
 import { cookies } from "next/headers";
 import "./globals.css";
 
-export const metadata = {
-  title: "EventPress",
-  description: "",
-};
+// export const metadata = {
+//   title: "EventPress",
+//   description: "",
+// };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const cookieStore = await cookies();
+  const themeCookie = cookieStore.get("theme");
+  const theme = themeCookie ? themeCookie.value : "light";
 
-  const themeCookie = cookies().get("theme"); // Get cookie object
-  const theme = themeCookie ? themeCookie.value : "light"; // Extract value safely
 
   return (
     <html lang="en">

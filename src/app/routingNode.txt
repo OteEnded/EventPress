@@ -1,1 +1,2 @@
-eventpress.com/
+eventpress.com/ -> landing page
+[eventIdName] -> event/[eventIdName] -> attendeeSideEventPage

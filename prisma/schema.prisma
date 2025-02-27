@@ -6,6 +6,8 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+  output = "./generated/client"
 }
 
 datasource db {
@@ -13,21 +15,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
-  UserID       String   @id @default(uuid()) @unique
-  IdentityEmail String   @unique
-  DisplayName  String?
-  PasswordHash String
-  UserProfiles UserProfiles?
+model request_logs {
+  request_id      String  @id @default(uuid()) @unique
+  rolling_order   Int?
+  request_from    String
+  request_to      String
+  request_protocol String
+  request_method  String
+  request_header  Json
+  request_body    Json
+  cookies         Json
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 }
 
-model UserProfiles {
-  UserID       String   @id @unique
-  Firstname    String
-  Lastname     String
-  DisplayName  String?
-  ContactEmail String
-  Age          Int?
-  PhoneNO      String?
-  user         Users    @relation(fields: [UserID], references: [UserID])
+model users {
+  user_id       String   @id @default(uuid()) @unique
+  identity_email String   @unique
+  password_hash String
+  user_profile user_profiles?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+}
+
+model user_profiles {
+  user_id       String   @id @unique
+  firstname    String
+  lastname     String
+  display_name  String?
+  contact_email String?
+  age          Int?
+  phone_no      String?
+  user         users    @relation(fields: [user_id], references: [user_id])
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 }
