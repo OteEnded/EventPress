@@ -66,7 +66,7 @@ export async function middleware(req) {
     }
 
     const cookieStore = req.cookies;
-    const theme = cookieStore.get("theme")?.value || "light";
+    const theme = cookieStore.get("theme")?.value || "dark ";
     const res = NextResponse.next();
     res.headers.set("X-Theme", theme);
     return res;

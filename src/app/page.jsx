@@ -10,8 +10,20 @@ export const metadata = {
 export default async function HomePage() {
     return (
         <>
-            <div className="p-4 flex justify-end">
+            <div className="p-4 flex justify-between items-center">
                 <ThemeToggle />
+                <div>
+                    <Link href="/organizer/staffinvitation">
+                        <button className="mr-4 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg text-sm font-medium hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 transition">
+                            Staff Invitation Login
+                        </button>
+                    </Link>
+                    <Link href="/organizer/login">
+                        <button className="px-6 py-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
+                            Login
+                        </button>
+                    </Link>
+                </div>
             </div>
             {/* <LandingPage /> */}
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 px-6">
@@ -82,11 +94,14 @@ export default async function HomePage() {
                         management. Create engaging event pages and enhance
                         attendee experience effortlessly.
                     </p>
-                    <Link href="/organizer">
+                    <Link href="/organizer/register">
                         <button className="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
                             Register as an Organizer
                         </button>
                     </Link>
+                    <p className="mt-4 text-gray-600 dark:text-gray-300">
+                        Already have an account? <Link href="/organizer/login"><span className="text-blue-600 dark:text-blue-400 hover:underline">Login right away</span></Link>
+                    </p>
                 </section>
             </div>
         </>
