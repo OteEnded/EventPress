@@ -11,11 +11,11 @@ export default function RegisterForm() {
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 px-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#5E9BD6] dark:bg-gray-900 text-white px-6">
       <header className="text-center mb-12">
-        <h1 className="text-5xl font-extrabold mb-4">Register as an Organizer</h1>
-        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl">
-          Join EventPress and start organizing your events with ease.
+        <h1 className="text-5xl font-extrabold mb-4"> SIGN UP </h1>
+        <p className="text-lg dark:text-gray-300 max-w-2xl">
+          เข้าร่วม EventPress และเริ่มจัดการอีเวนต์ได้เลย.
         </p>
       </header>
 
@@ -23,7 +23,7 @@ export default function RegisterForm() {
         <form>
           <div className="mb-4">
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Name
+              ชื่อองค์กร/หน่วยงาน
             </label>
             <input
               type="text"
@@ -36,7 +36,7 @@ export default function RegisterForm() {
 
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Email
+              อีเมล
             </label>
             <input
               type="email"
@@ -49,7 +49,7 @@ export default function RegisterForm() {
 
           <div className="mb-4">
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Password
+              รหัสผ่าน
             </label>
             <input
               type="password"
@@ -69,14 +69,15 @@ export default function RegisterForm() {
                 required
               />
               <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
-                I accept the
-                <button type="button" onClick={() => setIsTermsOpen(true)} className="text-blue-600 dark:text-blue-400 hover:underline ml-1">
-                  Terms of Service
+                ฉันยอมรับ
+                <button type="button" onClick={() => setIsTermsOpen(true)} className="text-blue-600 dark:text-blue-400 hover:underline mx-1">
+                  นโยบายความเป็นส่วนตัว 
                 </button>
-                and
-                <button type="button" onClick={() => setIsPrivacyOpen(true)} className="text-blue-600 dark:text-blue-400 hover:underline ml-1">
-                  Privacy Policy
-                </button>.
+                และ 
+                <button type="button" onClick={() => setIsPrivacyOpen(true)} className="text-blue-600 dark:text-blue-400 hover:underline mx-1">
+                  ข้อตกลงการใช้งาน
+                </button>
+                ของ EventPress
               </span>
             </label>
           </div>
@@ -86,7 +87,7 @@ export default function RegisterForm() {
               type="submit"
               className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition"
             >
-              Register
+              ลงทะเบียน
             </button>
           </div>
         </form>
