@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import "tw-elements"; // Import TW Elements styles
 
 
 const ThemeContext = createContext();
@@ -16,7 +15,7 @@ export function ThemeProvider({ children }) {
 
   // Function to toggle theme and update cookies
   const toggleTheme = async () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
+    const newTheme = theme === "dark" ? "dark" : "light";
     setTheme(newTheme);
     document.documentElement.classList.toggle("dark", newTheme === "dark");
 
@@ -28,9 +27,6 @@ export function ThemeProvider({ children }) {
     });
   };
 
-
-  useEffect(() => {
-  }, []);
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       {children}
