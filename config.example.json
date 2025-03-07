@@ -1,0 +1,22 @@
+{
+    "database": {
+        "connections": {
+            "development": {
+                "user": "",
+                "password": "",
+                "database": "",
+                "host": "",
+                "port": null
+            },
+            "production": {
+                "user": "",
+                "password": null,
+                "database": "",
+                "host": ""
+            }
+        },
+
+        "connection_in_use": "development"
+    },
+    "is_log_request": true
+}
