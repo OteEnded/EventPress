@@ -58,6 +58,12 @@ You can start editing the page by modifying `app/page.js`. The page auto-updates
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Configuration Files
+
+This project mainly uses `config.json` to store project configuration, including database connection and other settings. This is similar to using `.env` files in other projects. However, there are also uses of `.env` and `.env.local` files for some library or framework credentials.
+
+You might need to ask for these files from the repository owner, Ote. You can contact Ote through Discord if you already have the contact, but it is also fine to reach out via email at ratnaritjumnong@gmail.com.
+
 ## Collaborators
 
 - [OteEnded](https://github.com/OteEnded)
