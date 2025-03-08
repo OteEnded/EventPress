@@ -1,4 +1,5 @@
-import { ThemeProvider } from "../ui/providers/ThemeProvider"; // Import ThemeProvider, Theme Context
+import { ThemeProvider } from "@/ui/providers/ThemeProvider"; // Import ThemeProvider, Theme Context
+import { AuthProvider } from "@/ui/providers/AuthProvider";
 import { cookies } from "next/headers";
 import "./globals.css";
 
@@ -17,7 +18,9 @@ export default async function RootLayout({ children }) {
     <html lang="en" className={theme === "dark" ? "dark" : ""}>
       <body className="bg-white dark:bg-gray-900 text-black dark:text-white">
         <ThemeProvider>
+          <AuthProvider>
           {children}
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

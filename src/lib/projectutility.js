@@ -16,27 +16,12 @@ export function readJSONFile(filePath){
     }
 }
 
-// export function getConfigAsRoot(){
-//     log("projectutility[getConfig]: Getting config data:")
-//     try {
-//         const configData = readJSONFile('./config.json')
-//         log("projectutility[getConfig]: ☆★ CONFIG DATA IS GOTTEN! ★☆.")
-//         // console.log(configData)
-//         return configData
-//     }
-//     catch (err) {
-//         console.error('projectutility[getConfig]: ERROR, cannot get config data.')
-//         console.error(err)
-//         return err
-//     }
-// }
-
 export function getConfig(is_log){
-    if (is_log == null) log("projectutility[getConfig]: Getting config data:")
+    if (is_log !== false) log("projectutility[getConfig]: Getting config data:")
     try {
         const configData = config
-        if (is_log == null) log("projectutility[getConfig]: ☆★ CONFIG DATA IS GOTTEN! ★☆.")
-        console.log(configData)
+        if (is_log !== false) log("projectutility[getConfig]: ☆★ CONFIG DATA IS GOTTEN! ★☆.")
+        // console.log(configData)
         return configData
     }
     catch (err) {
@@ -103,7 +88,7 @@ export function getDBConnectionConfig() {
     const configData = getConfig();
     const databaseConfig = configData["database"];
 
-    log("dbconnector[getDBConnectionConfig]: Validating database connection config ->", configData);
+    log("dbconnector[getDBConnectionConfig]: Validating database connection config ->") //, configData);
 
     if (!databaseConfig || !databaseConfig.hasOwnProperty("connections")) {
         throw new Error("dbconnector[getDBConnectionConfig]: ABORT, invalid database config.");

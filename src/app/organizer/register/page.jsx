@@ -16,7 +16,8 @@ export default function OrganizerRegisterPage() {
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
     const [agreement, setAgreement] = useState(false);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -55,6 +56,7 @@ export default function OrganizerRegisterPage() {
                 const form = e.target;
                 form.reset();
                 setError(null);
+                setSuccess("Registration successful.");
             } else {
                 const data = await response.json();
                 setError(data.message);
@@ -81,6 +83,12 @@ export default function OrganizerRegisterPage() {
                     {error && (
                         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
                             {error}
+                        </div>
+                    )}
+
+                    {success && (
+                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4">
+                            {success}
                         </div>
                     )}
 

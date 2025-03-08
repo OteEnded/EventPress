@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { getConnection } from "@/lib/dbconnector";
-import { users } from "@/database/schema";
+import { users, userCredentials } from "@/database/schema";
 import { eq, lt, gte, ne } from 'drizzle-orm';
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export async function POST(req) {
 
@@ -28,12 +28,12 @@ export async function POST(req) {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // // Create the new user
-        await dbConnection.insert(users).values({
+        const newUser = (await dbConnection.insert(users).values({
             identity_email: email,
             identity_password: hashedPassword
-        });
+        }).returning())[0];
 
-        usersInDB = await dbConnection.select().from(usersInDB).where(eq(users.identity_email, email));
+        usersInDB = await dbConnection.select().from(users).where(eq(users.identity_email, email));
         if (usersInDB.length > 1) {
             console.error(`Multiple users found with the same email address. Email: ${email}, Wonder if this may cause by race condition.`);
             return NextResponse.json({ message: "Internal server error." }, { status: 500 });
@@ -42,9 +42,17 @@ export async function POST(req) {
             console.error(`Cannot find the user after registration. Email: ${email}`);
             return NextResponse.json({ message: "Internal server error." }, { status: 500 });
         }
-        const newUser = usersInDB[0];
+        // const newUser = usersInDB[0];
 
         console.log("New User:", newUser);
+
+        // Create the user credentials
+        const newUserCredentials = (await dbConnection.insert(userCredentials).values({
+            user_id: newUser.user_id,
+            password_hash: hashedPassword
+        }).returning())[0];
+
+        console.log("New User Credentials:", newUserCredentials);
 
         return NextResponse.json({ message: "Registration successful." }, { status: 201 });
     }
