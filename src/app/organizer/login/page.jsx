@@ -42,7 +42,7 @@ export default function LoginForm() {
                 return;
             } 
             
-            router.replace("/");
+            router.replace("/organizer");
 
         } catch (error) {
             setError("An error occurred. Please try again later.");
