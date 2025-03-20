@@ -10,5 +10,5 @@ export const userProfiles = pgTable("user_profiles", {
     age: integer("age"),
     phone_no: varchar("phone_no"),
     created_at: timestamp("created_at").defaultNow(),
-    updated_at: timestamp("updated_at").defaultNow()
+    updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull()
 });

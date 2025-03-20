@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1741267690053,
-      "tag": "0000_jittery_mac_gargan",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1741426082684,
-      "tag": "0001_goofy_swarm",
+      "when": 1742481844364,
+      "tag": "0000_init_for_auth",
       "breakpoints": true
     }
   ]

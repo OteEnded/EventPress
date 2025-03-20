@@ -1,3 +1,5 @@
+CREATE TYPE "public"."choice_event_layers" AS ENUM('EVENT', 'BOOTH', 'ACTIVITY', 'ACTIVITY_SLOT');--> statement-breakpoint
+CREATE TYPE "public"."choice_permission_types" AS ENUM('READ_HEADER', 'EDIT_HEADER', 'READ_RECURRIVE', 'EDIT_RECURRIVE', 'READ_STAFF', 'EDIT_STAFF');--> statement-breakpoint
 CREATE TYPE "public"."choice_signin_methods" AS ENUM('CREDENTIALS', 'GOOGLE');--> statement-breakpoint
 CREATE TABLE "request_logs" (
 	"request_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
@@ -10,14 +12,14 @@ CREATE TABLE "request_logs" (
 	"request_body" jsonb NOT NULL,
 	"cookies" jsonb NOT NULL,
 	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now()
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "user_credentials" (
 	"user_id" uuid PRIMARY KEY NOT NULL,
-	"password" varchar NOT NULL,
+	"password_hash" varchar NOT NULL,
 	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now()
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "user_profiles" (
@@ -29,7 +31,7 @@ CREATE TABLE "user_profiles" (
 	"age" integer,
 	"phone_no" varchar,
 	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now()
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "user_signin_methods" (
@@ -37,14 +39,14 @@ CREATE TABLE "user_signin_methods" (
 	"user_id" uuid,
 	"method" "choice_signin_methods" NOT NULL,
 	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now()
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
 	"user_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"identity_email" varchar NOT NULL,
 	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "users_identity_email_unique" UNIQUE("identity_email")
 );
 --> statement-breakpoint

@@ -1,6 +1,6 @@
 
 
-export default function EventManagePage({ params }) {
+export default function OrganizerEventManagePage({ params }) {
     return 
     <>
     </>;

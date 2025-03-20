@@ -16,7 +16,7 @@ export async function middleware(req) {
         (urlPath[1] != "api" && urlPath[2] != "log-request") && 
         urlPath[1] != "_next" && 
         urlPath[1] != "favicon.ico" // && 
-        // (putil.getConfig())["is_log_request"] === "true"
+        // (putil.getConfig(false))["is_log_request"] === "true"
         // && false
         // || true
     ) {

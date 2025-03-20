@@ -18,5 +18,6 @@
 
         "connection_in_use": "development"
     },
-    "is_log_request": true
+    "is_log_request": true,
+    "next_auth_secret": "nextjsauth"
 }

@@ -17,10 +17,10 @@ export function readJSONFile(filePath){
 }
 
 export function getConfig(is_log){
-    if (is_log !== false) log("projectutility[getConfig]: Getting config data:")
+    if (is_log === true) log("projectutility[getConfig]: Getting config data:")
     try {
         const configData = config
-        if (is_log !== false) log("projectutility[getConfig]: ☆★ CONFIG DATA IS GOTTEN! ★☆.")
+        if (is_log === true) log("projectutility[getConfig]: ☆★ CONFIG DATA IS GOTTEN! ★☆.")
         // console.log(configData)
         return configData
     }
@@ -85,7 +85,7 @@ export function objLen(obj){
 }
 
 export function getDBConnectionConfig() {
-    const configData = getConfig();
+    const configData = getConfig(false);
     const databaseConfig = configData["database"];
 
     log("dbconnector[getDBConnectionConfig]: Validating database connection config ->") //, configData);

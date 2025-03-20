@@ -11,5 +11,5 @@ export const requestLogs = pgTable("request_logs", {
     request_body: jsonb("request_body").notNull(),
     cookies: jsonb("cookies").notNull(),
     created_at: timestamp("created_at").defaultNow(),
-    updated_at: timestamp("updated_at").defaultNow()
+    updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull()
 });

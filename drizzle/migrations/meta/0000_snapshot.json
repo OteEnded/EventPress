@@ -1,5 +1,5 @@
 {
-  "id": "7f4ad858-e26a-4e6b-af21-dbdbb67c8346",
+  "id": "3ee40cba-5a42-4530-913f-70779fd491c1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -74,7 +74,7 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -96,8 +96,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "password": {
-          "name": "password",
+        "password_hash": {
+          "name": "password_hash",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
@@ -113,7 +113,7 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -196,7 +196,7 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -257,7 +257,7 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -311,7 +311,7 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -333,6 +333,28 @@
     }
   },
   "enums": {
+    "public.choice_event_layers": {
+      "name": "choice_event_layers",
+      "schema": "public",
+      "values": [
+        "EVENT",
+        "BOOTH",
+        "ACTIVITY",
+        "ACTIVITY_SLOT"
+      ]
+    },
+    "public.choice_permission_types": {
+      "name": "choice_permission_types",
+      "schema": "public",
+      "values": [
+        "READ_HEADER",
+        "EDIT_HEADER",
+        "READ_RECURRIVE",
+        "EDIT_RECURRIVE",
+        "READ_STAFF",
+        "EDIT_STAFF"
+      ]
+    },
     "public.choice_signin_methods": {
       "name": "choice_signin_methods",
       "schema": "public",
