@@ -24,7 +24,7 @@ export default function LoginForm() {
     const router = useRouter();
 
     if (session) {
-        router.replace("/");
+        router.replace("/organizer");
     }
 
     const handleSubmit = async (e) => {
