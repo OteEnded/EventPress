@@ -11,8 +11,8 @@ export default async function OrganizerDashboardPage() {
         for (let i = 0; i < 3; i++) {
             result.push(
 
-                <div className="bg-white p-16 border border-primary my-5">
-                    <h2 className="text-2xl font-semibold text-gray-700">
+                <div className="bg-white dark:bg-gray-900 p-16 my-5 dark:text-white  text-gray-700">
+                    <h2 className="text-2xl font-semibold ">
                         {event_name}
                     </h2>
                     <p>
@@ -33,7 +33,7 @@ export default async function OrganizerDashboardPage() {
         for (let i = 0; i < 2; i++) {
             result.push(
                 <div>
-                    <h2 className="text-2xl font-semibold mb-4 text-gray-700">
+                    <h2 className="text-2xl font-semibold mb-4 text-gray-700 dark:text-white" >
                         {organize_name}
                     </h2>
                     {get_events()}
@@ -47,7 +47,7 @@ export default async function OrganizerDashboardPage() {
     return (
         <>
             <div className="min-h-screen flex flex-col bg-[#5E9BD6] text-gray-700 dark:bg-gray-900 px-6">
-                <div className="bg-white p-16 border border-primary my-5 flex flex-col w-full">
+                <div className="bg-white dark:bg-gray-800 dark:text-white p-16  border-primary my-5 flex flex-col w-full ">
                     <h1 className="text-3xl font-semibold mb-8"> อีเวนต์ของฉัน </h1>
                     <div>
                         {get_organizes()}
