@@ -61,6 +61,7 @@ export default function OrganizerRegisterPage() {
                 const data = await response.json();
                 setError(data.message);
             }
+            
         } catch (error) {
             console.log("An error occurred while registering.", error);
             setError("An error occurred while registering.");

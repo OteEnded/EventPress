@@ -112,6 +112,11 @@ export function getDBConnectionConfig() {
     return dbConfig;
 }
 
+export function isValidUUID(uuid) {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(uuid);
+}
+
 export default {
     readJSONFile,
     getConfig,
@@ -120,5 +125,6 @@ export default {
     ensureDirectoryExistence,
     log,
     objLen,
-    getDBConnectionConfig
+    getDBConnectionConfig,
+    isValidUUID,
 };

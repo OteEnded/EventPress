@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { logRequest } from "@/lib/models/requestlogs";
 import { cookies } from "next/headers";
 import { getConfig } from "@/lib/projectutility"
 // import { checkIfEventExists } from "@/lib/eventService"; // Function to check event existence

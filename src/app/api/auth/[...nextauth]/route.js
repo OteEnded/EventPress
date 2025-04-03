@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import putil from "@/lib/projectutility";
 import { getConnection } from "@/lib/dbconnector";
 import { users, userCredentials } from "@/database/schema";
-import { eq, lt, gte, ne } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import bcrypt from "bcryptjs";
 
 const config = putil.getConfig(false);
