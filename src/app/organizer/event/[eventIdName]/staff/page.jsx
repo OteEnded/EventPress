@@ -1,6 +1,6 @@
 
 
-export default function OrganizerEventStaffIndexPage({ params }) {
+export default async function OrganizerEventStaffIndexPage({ params }) {
     return 
     <>
     </>;

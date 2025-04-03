@@ -1,6 +1,6 @@
 
 
-export default function OrganizerActivityManagePage({ params }) {
+export default async function OrganizerActivityManagePage({ params }) {
     return 
     <>
     </>;

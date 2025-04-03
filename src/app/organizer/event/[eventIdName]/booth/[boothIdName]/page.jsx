@@ -1,6 +1,6 @@
 
 
-export default function OrganizerBoothManagePage({ params }) {
+export default async function OrganizerBoothManagePage({ params }) {
     return 
     <>
     </>;

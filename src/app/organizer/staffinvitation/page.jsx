@@ -1,6 +1,6 @@
 
 
-export default function StaffInvitationPage({ params }) {
+export default async function StaffInvitationPage({ params }) {
     return 
     <>
     </>;

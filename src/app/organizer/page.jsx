@@ -5,13 +5,14 @@ export default async function OrganizerDashboardPage() {
     const event_description = "พวกเราทีม VitaminCNC จะมาช่วยน้องๆเสริมภูมิคุ้มกัน ซ้อมทำข้อสอบก่อนลงสนาม!! จากรุ่นพี่ผู้มีประสบการณ์ผ่าน"
     
 
-    function get_events(){
-
+    function get_events() {
         let result = [];
         for (let i = 0; i < 3; i++) {
             result.push(
-
-                <div className="bg-white dark:bg-gray-900 p-16 my-5 dark:text-white  text-gray-700">
+                <div
+                    key={`event-${i}`} // Add a unique key for each event
+                    className="bg-white dark:bg-gray-900 p-16 my-5 dark:text-white text-gray-700"
+                >
                     <h2 className="text-2xl font-semibold ">
                         {event_name}
                     </h2>
@@ -22,18 +23,17 @@ export default async function OrganizerDashboardPage() {
                         แก้ไข
                     </button>
                 </div>
-
             );
         }
         return result;
     }
-
-    function get_organizes(){
+    
+    function get_organizes() {
         let result = [];
         for (let i = 0; i < 2; i++) {
             result.push(
-                <div>
-                    <h2 className="text-2xl font-semibold mb-4 text-gray-700 dark:text-white" >
+                <div key={`organize-${i}`}> {/* Add a unique key for each organize */}
+                    <h2 className="text-2xl font-semibold mb-4 text-gray-700 dark:text-white">
                         {organize_name}
                     </h2>
                     {get_events()}

@@ -7,7 +7,7 @@ import Modal from "@/ui/modals/InformationModal";
 import TermsOfService from "@/ui/modals/TermsOfService";
 import PrivacyPolicy from "@/ui/modals/PrivacyPolicy";
 
-export default function OrganizerRegisterPage() {
+export default async function OrganizerRegisterPage() {
     const [isTermsOpen, setIsTermsOpen] = useState(false);
     const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 

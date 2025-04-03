@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import ThemeToggle from "./ThemeToggle";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useTheme } from "../providers/ThemeProvider";
 import eventPressLogo from "@public/eventpress-logo.png";
 import { signOut } from "next-auth/react";
@@ -11,9 +11,52 @@ import { useSession } from "next-auth/react";
 
 export default function OrganizerNavbar() {
     // const { theme, toggleTheme } = useTheme();
+    const [userData, setUserData] = useState(null);
 
     const { data: session } = useSession();
     // console.log(session);
+    
+    // const userData = await fetch("/api/data/user/user_id", {
+    //     method: "GET",
+    //     headers: {
+    //         "Content-Type": "application/json",
+    //     },
+    // });
+    
+    useEffect(() => {
+        const fetchUserData = async () => {
+            if (userData) {
+                // If userData is already set, do nothing
+                return;
+            }
+    
+            if (!session?.user?.email) {
+                console.error("No session or email found");
+                return;
+            }
+    
+            try {
+                const response = await fetch("/api/data/user/get/identity_email", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ identity_email: session.user.email }),
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch user data: ${response.status}`);
+                }
+    
+                const data = await response.json();
+                setUserData(data.content);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+    
+        fetchUserData();
+    }, [session, userData]); // Add userData as a dependency
 
     return (
         <div className="px-2 py-1 flex justify-between items-center">
@@ -28,7 +71,7 @@ export default function OrganizerNavbar() {
                 <ThemeToggle />
             </div>
 
-            {JSON.stringify(session)}
+            {JSON.stringify(userData)}
 
             <div className="flex gap-4">
                 {!session ? (

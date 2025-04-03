@@ -16,7 +16,8 @@ export async function GET(req) {
     try {
         
         // const x = await dbConnection.select({user_id: users.user_id}).from(users).where(eq(users.identity_email, "admin@email.com"));
-        const x = await (await Organizer.getOrganizerByOrganizerId("dc966575-5a90-4335-9926-729c671dca99")).expand();
+        // const x = await (await Organizer.getOrganizerByOrganizerId("dc966575-5a90-4335-9926-729c671dca99")).expand();
+        const x = await Event.getEventsOfUser("dc966575-5a90-4335-9926-729c671dca98");
         
         console.log("Test API");
         console.log(x);

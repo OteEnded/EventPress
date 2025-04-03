@@ -1,6 +1,6 @@
 
 
-export default function OrganizerActivitySlotIndexPage({ params }) {
+export default async function OrganizerActivitySlotIndexPage({ params }) {
     return 
     <>
     </>;
