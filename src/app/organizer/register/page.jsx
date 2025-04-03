@@ -93,7 +93,7 @@ export default function OrganizerRegisterPage() {
                         </div>
                     )}
 
-                    <div className="mb-4">
+                    {/* <div className="mb-4">
                         <label
                             htmlFor="name"
                             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -108,7 +108,7 @@ export default function OrganizerRegisterPage() {
                             required
                             onChange={(e) => setName(e.target.value)}
                         />
-                    </div>
+                    </div> */}
 
                     <div className="mb-4">
                         <label
@@ -121,7 +121,7 @@ export default function OrganizerRegisterPage() {
                             type="email"
                             id="email"
                             name="email"
-                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             required
                             onChange={(e) => setEmail(e.target.value)}
 
@@ -139,7 +139,7 @@ export default function OrganizerRegisterPage() {
                             type="password"
                             id="password"
                             name="password"
-                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm "
                             required
                             onChange={(e) => setPassword(e.target.value)}
                         />
@@ -156,7 +156,7 @@ export default function OrganizerRegisterPage() {
                             type="password"
                             id="password_confirm"
                             name="password_confirm"
-                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             required
                             onChange={(e) => setPasswordConfirm(e.target.value)}
                         />
