@@ -50,6 +50,13 @@
       "when": 1743762854632,
       "tag": "0006_update_ondelete_for_user_releted",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1743775764507,
+      "tag": "0007_allow_null_for_some_event_field",
+      "breakpoints": true
     }
   ]
 }

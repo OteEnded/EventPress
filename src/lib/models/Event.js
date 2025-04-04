@@ -101,6 +101,103 @@ async function getEventsOfUser(userId) {
     return result;
 }
 
+async function createEvent(req) {
+    const dbConnection = getConnection();
+
+    if (!req) {
+        throw new Error("Event object is required.");
+    }
+    
+    if (!req || typeof req !== "object") {
+        throw new Error("Invalid event object format.");
+    }
+    
+    // event_id: uuid().defaultRandom().primaryKey(),
+    // organizer: uuid().notNull().references(() => organizers.organizer_id, { onDelete: "cascade" }),
+    // name: varchar().notNull(),
+    // id_name: varchar(),
+    // description: varchar(),
+    // location: varchar(),
+    // start: timestamp(),
+    // end: timestamp(),
+    // capacity: varchar(),
+    // price: real().default(0.0),
+    // contact_info: varchar(),
+    // // web_page: uuid("web_page").references(() => webPages.web_page_id, { onDelete: "set null" }),
+    
+    const requiredFields = [
+        "organizer",
+        "name",
+        // "id_name",
+        "description",
+        // "location",
+        // "start",
+        // "end",
+        // "capacity",
+        // "price",
+        // "contact_info",
+        // // "web_page",
+    ];
+    
+    for (const field of requiredFields) {
+        if (!req[field]) {
+            throw new Error(`Missing required field: ${field}`);
+        }
+    }
+    if (typeof req.organizer === "object") {
+        if (!req.organizer.organizer_id) {
+            throw new Error("Missing required field: organizer_id in organizer object");
+        }
+        req.organizer = req.organizer.organizer_id;
+    }
+    if (!projectutility.isValidUUID(req.organizer)) {
+        throw new Error("Invalid Organizer ID format.");
+    }
+    if (typeof req.name !== "string") {
+        throw new Error("Invalid name format.");
+    }
+    if (req.id_name && typeof req.id_name !== "string") {
+        throw new Error("Invalid id_name format.");
+    }
+    if (req.start && !projectutility.isValidDate(req.start)) {
+        throw new Error("Invalid start date format.");
+    }
+    if (req.end && !projectutility.isValidDate(req.end)) {
+        throw new Error("Invalid end date format.");
+    }
+    if (req.capacity && typeof req.capacity !== "number") {
+        throw new Error("Invalid capacity format.");
+    }
+    if (req.price && typeof req.price !== "number") {
+        throw new Error("Invalid price format.");
+    }
+    if (req.contact_info && typeof req.contact_info !== "string") {
+        throw new Error("Invalid contact_info format.");
+    }
+    
+    const insertResult = await dbConnection
+        .insert(events)
+        .values({
+            organizer: req.organizer,
+            name: req.name,
+            id_name: req.id_name,
+            description: req.description,
+            location: req.location,
+            start: req.start,
+            end: req.end,
+            capacity: req.capacity,
+            price: req.price,
+            contact_info: req.contact_info,
+        })
+        .returning();
+        
+    if (insertResult.length === 0) {
+        throw new Error("Failed to create event.");
+    }
+    return insertResult[0];
+    
+}
+
 export default {
     getEventByEventId,
     getEventsByOrganizerId,

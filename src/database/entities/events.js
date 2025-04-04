@@ -11,13 +11,13 @@ export const events = pgTable("events", {
     id_name: varchar(),
     description: varchar(),
     location: varchar(),
-    start: timestamp().notNull(),
-    end: timestamp().notNull(),
+    start: timestamp(),
+    end: timestamp(),
     capacity: varchar(),
     price: real().default(0.0),
     contact_info: varchar(),
     // web_page: uuid("web_page").references(() => webPages.web_page_id, { onDelete: "set null" }),
     
     created_at: timestamp().defaultNow(),
-    updated_at: timestamp().defaultNow().$onUpdate(() => new Date()).notNull()
+    updated_at: timestamp().defaultNow().$onUpdate(() => new Date())
 });
