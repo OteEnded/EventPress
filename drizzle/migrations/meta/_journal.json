@@ -43,6 +43,13 @@
       "when": 1743755256540,
       "tag": "0005_drop_organizer_business_name",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1743762854632,
+      "tag": "0006_update_ondelete_for_user_releted",
+      "breakpoints": true
     }
   ]
 }

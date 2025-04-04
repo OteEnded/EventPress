@@ -22,7 +22,7 @@ export default function LoginForm() {
     const [success, setSuccess] = useState("");
     
     const { data: session } = useSession();
-    const router = useRouter();
+    // const router = useRouter();
 
     if (session) {
         redirect("/organizer");

@@ -1,8 +1,9 @@
 import { pgTable, varchar, uuid, integer, timestamp } from "drizzle-orm/pg-core";
 import { users } from "./users.js";
 
+// 'cascade' | 'restrict' | 'no action' | 'set null' | 'set default';
 export const userProfiles = pgTable("user_profiles", {
-    user: uuid().primaryKey().references(() => users.user_id),
+    user: uuid().primaryKey().references(() => users.user_id, { onDelete: 'cascade' }),
     firstname: varchar().notNull(),
     lastname: varchar().notNull(),
     display_name: varchar(),

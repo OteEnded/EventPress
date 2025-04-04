@@ -6,18 +6,31 @@ import Image from "next/image";
 import Modal from "@/ui/modals/InformationModal";
 import TermsOfService from "@/ui/modals/TermsOfService";
 import PrivacyPolicy from "@/ui/modals/PrivacyPolicy";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
-export default async function OrganizerRegisterPage() {
+export default function OrganizerRegisterPage() {
     const [isTermsOpen, setIsTermsOpen] = useState(false);
     const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
+    const [firstname, setFirstname] = useState("");
+    const [lastname, setLastname] = useState("");
+    const [displayName, setDisplayName] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [age, setAge] = useState("");
+    const [indentityEmail, setIndentityEmail] = useState("");
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
     const [agreement, setAgreement] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    
+    const { data: session } = useSession();
+    // const router = useRouter();
+
+    if (session) {
+        redirect("/organizer");
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -32,8 +45,8 @@ export default async function OrganizerRegisterPage() {
             return;
         }
 
-        if (!name || !email || !password || !passwordConfirm) {
-            setError("Please fill in all fields.");
+        if (!firstname || !lastname || !indentityEmail || !password || !passwordConfirm) {
+            setError("Please fill in all required fields.");
             return;
         }
 
@@ -44,9 +57,13 @@ export default async function OrganizerRegisterPage() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    name,
-                    email,
+                    indentity_email: indentityEmail,
                     password,
+                    firstname,
+                    lastname,
+                    display_name: displayName,
+                    phone_number: phoneNumber,
+                    age,
                 }),
             });
 
@@ -61,13 +78,11 @@ export default async function OrganizerRegisterPage() {
                 const data = await response.json();
                 setError(data.message);
             }
-            
         } catch (error) {
             console.log("An error occurred while registering.", error);
             setError("An error occurred while registering.");
         }
-
-    }
+    };
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-[#5E9BD6] dark:bg-gray-900 text-white px-6">
@@ -80,7 +95,6 @@ export default async function OrganizerRegisterPage() {
 
             <section className="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md">
                 <form onSubmit={handleSubmit}>
-
                     {error && (
                         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
                             {error}
@@ -102,14 +116,13 @@ export default async function OrganizerRegisterPage() {
                         </label>
                         <input
                             type="text"
-                            id="name"
-                            name="name"
-                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            id="firstname"
+                            name="firstname"
+                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             required
-                            onChange={(e) => setName(e.target.value)}
+                            onChange={(e) => setFirstname(e.target.value)}
                         />
                     </div>
-
 
                     <div className="mb-4">
                         <label
@@ -120,11 +133,11 @@ export default async function OrganizerRegisterPage() {
                         </label>
                         <input
                             type="text"
-                            id="name"
-                            name="name"
-                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            id="lastname"
+                            name="lastname"
+                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             required
-                            onChange={(e) => setName(e.target.value)}
+                            onChange={(e) => setLastname(e.target.value)}
                         />
                     </div>
 
@@ -137,10 +150,10 @@ export default async function OrganizerRegisterPage() {
                         </label>
                         <input
                             type="text"
-                            id="name"
-                            name="name"
-                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            onChange={(e) => setName(e.target.value)}
+                            id="display_name"
+                            name="display_name"
+                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            onChange={(e) => setDisplayName(e.target.value)}
                         />
                     </div>
 
@@ -152,12 +165,11 @@ export default async function OrganizerRegisterPage() {
                             อายุ
                         </label>
                         <input
-                            type="้number"
-                            id="name"
-                            name="name"
-                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            required
-                            onChange={(e) => setName(e.target.value)}
+                            type="number"
+                            id="age"
+                            name="age"
+                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            onChange={(e) => setAge(e.target.value)}
                         />
                     </div>
 
@@ -170,29 +182,27 @@ export default async function OrganizerRegisterPage() {
                         </label>
                         <input
                             type="text"
-                            id="name"
-                            name="name"
-                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            required
-                            onChange={(e) => setName(e.target.value)}
+                            id="phone_number"
+                            name="phone_number"
+                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:text-gray-300 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            onChange={(e) => setPhoneNumber(e.target.value)}
                         />
                     </div>
 
-                                        <div className="mb-4">
+                    <div className="mb-4">
                         <label
-                            htmlFor="email"
+                            htmlFor="indentity_email"
                             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                         >
                             อีเมล
                         </label>
                         <input
                             type="email"
-                            id="email"
-                            name="email"
-                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            id="indentity_email"
+                            name="indentity_email"
+                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:text-gray-300 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             required
-                            onChange={(e) => setEmail(e.target.value)}
-
+                            onChange={(e) => setIndentityEmail(e.target.value)}
                         />
                     </div>
 
@@ -207,7 +217,7 @@ export default async function OrganizerRegisterPage() {
                             type="password"
                             id="password"
                             name="password"
-                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm "
+                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:text-gray-300 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm "
                             required
                             onChange={(e) => setPassword(e.target.value)}
                         />
@@ -224,7 +234,7 @@ export default async function OrganizerRegisterPage() {
                             type="password"
                             id="password_confirm"
                             name="password_confirm"
-                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:text-gray-300 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             required
                             onChange={(e) => setPasswordConfirm(e.target.value)}
                         />
