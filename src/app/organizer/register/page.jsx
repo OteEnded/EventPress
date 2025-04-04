@@ -93,12 +93,12 @@ export default async function OrganizerRegisterPage() {
                         </div>
                     )}
 
-                    {/* <div className="mb-4">
+                    <div className="mb-4">
                         <label
-                            htmlFor="name"
+                            htmlFor="firstname"
                             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                         >
-                            ชื่อองค์กร/หน่วยงาน
+                            ชื่อจริง
                         </label>
                         <input
                             type="text"
@@ -108,9 +108,77 @@ export default async function OrganizerRegisterPage() {
                             required
                             onChange={(e) => setName(e.target.value)}
                         />
-                    </div> */}
+                    </div>
+
 
                     <div className="mb-4">
+                        <label
+                            htmlFor="lastname"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            นามสกุล
+                        </label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            required
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label
+                            htmlFor="display_name"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            ชื่อบัญชีผู้ใช้
+                        </label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label
+                            htmlFor="age"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            อายุ
+                        </label>
+                        <input
+                            type="้number"
+                            id="name"
+                            name="name"
+                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            required
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label
+                            htmlFor="phone_number"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            หมายเลขโทรศัพท์
+                        </label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            required
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                    </div>
+
+                                        <div className="mb-4">
                         <label
                             htmlFor="email"
                             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -150,7 +218,7 @@ export default async function OrganizerRegisterPage() {
                             htmlFor="password_confirm"
                             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                         >
-                            รหัสผ่าน
+                            ยืนยันรหัสผ่าน
                         </label>
                         <input
                             type="password"

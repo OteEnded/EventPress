@@ -3,10 +3,17 @@ import User from "@/lib/models/User";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/next-auth-options";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function OrganizerDashboardPage() {
 
     const session = await getServerSession(authOptions);
+
+    // if !session redirect to root
+    if (!session) {
+        redirect("/");
+    }
+
     const user = await User.getUserByIdentityEmail(session.user.email);
 
     const organize_name = "องค์กร"
