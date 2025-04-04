@@ -3,6 +3,8 @@ import { choicePermissionTypes } from "./enums/choice_permission_types.js";
 import { choiceEventLayers } from "./enums/choice_event_layers.js";
 import { choiceFileTypes } from "./enums/choice_file_types.js";
 
+import { lower } from "./functions.js"
+
 import { users } from "./entities/users.js";
 import { userProfiles } from "./entities/user_profiles.js";
 import { userCredentials } from "./entities/user_credentials.js";
@@ -22,6 +24,9 @@ export {
     choiceSigninMethods,
     choicePermissionTypes,
     choiceEventLayers,
+    
+    // Functions
+    lower,
     
     // Entities
     users,

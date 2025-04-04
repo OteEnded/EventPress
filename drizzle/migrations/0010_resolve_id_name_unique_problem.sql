@@ -1,0 +1,1 @@
+ALTER TABLE "events" DROP CONSTRAINT "events_id_name_unique";

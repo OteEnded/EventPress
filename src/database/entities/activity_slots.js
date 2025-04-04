@@ -1,4 +1,4 @@
-import { pgTable, varchar, uuid, timestamp  } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, timestamp  } from "drizzle-orm/pg-core";
 import { activities } from "./activities";
 // import { webPages } from "./web_pages.js";
 
@@ -15,8 +15,8 @@ import { activities } from "./activities";
 export const activitySlots = pgTable("activity_slots", {
     activity_slot_id: uuid().defaultRandom().primaryKey(),
     activity: uuid().notNull().references(() => activities.activity_id, { onDelete: "cascade" }),
-    description: varchar(),
-    location: varchar(),
+    description: text(),
+    location: text(),
     start: timestamp().notNull(),
     end: timestamp().notNull(),
     

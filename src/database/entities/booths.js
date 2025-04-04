@@ -1,4 +1,4 @@
-import { pgTable, varchar, uuid, timestamp  } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, timestamp  } from "drizzle-orm/pg-core";
 import { events } from "./events.js";
 // import { webPages } from "./web_pages.js";
 
@@ -17,11 +17,11 @@ import { events } from "./events.js";
 export const booths = pgTable("booths", {
     booth_id: uuid().defaultRandom().primaryKey(),
     event: uuid().notNull().references(() => events.event_id, { onDelete: "cascade" }),
-    name: varchar().notNull(),
-    description: varchar(),
-    location: varchar(),
-    contact_info: varchar(),
-    booth_type: varchar(),
+    name: text().notNull(),
+    description: text(),
+    location: text(),
+    contact_info: text(),
+    booth_type: text(),
     
     // web_page: uuid("web_page").references(() => webPages.web_page_id, { onDelete: "set null" }),
     

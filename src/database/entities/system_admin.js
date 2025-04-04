@@ -1,4 +1,4 @@
-import { pgTable, varchar, uuid, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, timestamp } from "drizzle-orm/pg-core";
 import { users } from "./users.js";
 
 /*
@@ -11,7 +11,7 @@ import { users } from "./users.js";
 export const userProfiles = pgTable("user_profiles", {
     system_admin_id: uuid().defaultRandom().primaryKey(),
     user: uuid().references(() => users.user_id, { onDelete: 'cascade' }),
-    note: varchar(),
+    note: text(),
     
     created_at: timestamp().defaultNow(),
     updated_at: timestamp().defaultNow().$onUpdate(() => new Date()).notNull()
