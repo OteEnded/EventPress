@@ -9,14 +9,45 @@ export async function POST(req) {
     const dbConnection = getConnection();
     
     try {
-        const { email, password } = await req.json();
+        
+        let request_body;
+        try {
+            request_body = await req.json();
+        } catch (error) {
+            console.error("API ERROR: Failed to parse JSON body", error);
+            return NextResponse.json(
+                { error: "Invalid JSON body" },
+                { status: 400 }
+            );
+        }
 
-        console.log(email, password);
+        if (!request_body || typeof request_body !== "object") {
+            return NextResponse.json(
+                { error: "Invalid request body" },
+                { status: 400 }
+            );
+        }
+
+        // Ensure required fields exist
+        const requiredFields = [
+            "indentity_email",
+            "password",
+            "first_name",
+            "last_name",
+            // "display_name",
+            // "contact_email",
+            // "phone_number",
+            // "age"
+        ];
+        
+        // const { email, password } = request_body;
+
+        console.log(request_body.indentity_email, request_body.password);
 
         // drizzle-orm
-        let usersInDB = await dbConnection.select().from(users).where(eq(users.identity_email, email));
+        let usersInDB = await dbConnection.select().from(users).where(eq(users.identity_email, request_body.indentity_email));
         if (usersInDB.length > 1) {
-            console.error(`Multiple users found with the same email address. Email: ${email}`);
+            console.error(`Multiple users found with the same email address. Email: ${request_body.indentity_email}`);
             return NextResponse.json({ message: "Internal server error." }, { status: 500 });
         }
         if (usersInDB.length > 0) {
@@ -25,21 +56,21 @@ export async function POST(req) {
         console.log(usersInDB);
 
         // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(request_body.password, 10);
 
         // // Create the new user
         const newUser = (await dbConnection.insert(users).values({
-            identity_email: email,
+            identity_email: request_body.indentity_email,
             identity_password: hashedPassword
         }).returning())[0];
 
-        usersInDB = await dbConnection.select().from(users).where(eq(users.identity_email, email));
+        usersInDB = await dbConnection.select().from(users).where(eq(users.identity_email, request_body.indentity_email));
         if (usersInDB.length > 1) {
-            console.error(`Multiple users found with the same email address. Email: ${email}, Wonder if this may cause by race condition.`);
+            console.error(`Multiple users found with the same email address. Email: ${request_body.indentity_email}, Wonder if this may cause by race condition.`);
             return NextResponse.json({ message: "Internal server error." }, { status: 500 });
         }
         if (usersInDB.length === 0) {
-            console.error(`Cannot find the user after registration. Email: ${email}`);
+            console.error(`Cannot find the user after registration. Email: ${request_body.indentity_email}`);
             return NextResponse.json({ message: "Internal server error." }, { status: 500 });
         }
         // const newUser = usersInDB[0];

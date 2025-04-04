@@ -4,18 +4,18 @@ import { files } from "./files.js";
 
 // 'cascade' | 'restrict' | 'no action' | 'set null' | 'set default';
 export const organizers = pgTable("organizers", {
-    organizer_id: uuid("organizer_id").defaultRandom().primaryKey(),
-    owner: uuid("owner").notNull().references(() => users.user_id, { onDelete: "cascade" }),
+    organizer_id: uuid().defaultRandom().primaryKey(),
+    owner: uuid().notNull().references(() => users.user_id, { onDelete: "cascade" }),
     
-    name: varchar("name").notNull(),
-    business_name: varchar("business_name"),
-    description: varchar("description"),
-    logo: uuid("logo").references(() => files.file_id, { onDelete: "set null" }),
-    website: varchar("website"),
-    email: varchar("email"),
-    phone: varchar("phone"),
-    address: varchar("address"),
+    name: varchar().notNull(),
+    // business_name: varchar(),
+    description: varchar(),
+    logo: uuid().references(() => files.file_id, { onDelete: "set null" }),
+    website: varchar(),
+    email: varchar(),
+    phone_number: varchar(),
+    address: varchar(),
     
-    created_at: timestamp("created_at").defaultNow(),
-    updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull()
+    created_at: timestamp().defaultNow(),
+    updated_at: timestamp().defaultNow().$onUpdate(() => new Date()).notNull()
 });

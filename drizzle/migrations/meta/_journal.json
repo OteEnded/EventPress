@@ -22,6 +22,27 @@
       "when": 1743695084728,
       "tag": "0002_rename_user_id_fk_column",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1743751969284,
+      "tag": "0003_rename_phone_no_to_phone_number",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1743752152830,
+      "tag": "0004_change_req_log_iding",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1743755256540,
+      "tag": "0005_drop_organizer_business_name",
+      "breakpoints": true
     }
   ]
 }

@@ -13,13 +13,13 @@ import { booths } from "./booths.js";
 
 // 'cascade' | 'restrict' | 'no action' | 'set null' | 'set default';
 export const activities = pgTable("activities", {
-    activity_id: uuid("activity_id").defaultRandom().primaryKey(),
+    activity_id: uuid().defaultRandom().primaryKey(),
     
-    booth: uuid("booth").notNull().references(() => booths.booth_id, { onDelete: "cascade" }),
-    name: varchar("name").notNull(),
-    description: varchar("description"),
-    location: varchar("location"),
+    booth: uuid().notNull().references(() => booths.booth_id, { onDelete: "cascade" }),
+    name: varchar().notNull(),
+    description: varchar(),
+    location: varchar(),
     
-    created_at: timestamp("created_at").defaultNow(),
-    updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull()
+    created_at: timestamp().defaultNow(),
+    updated_at: timestamp().defaultNow().$onUpdate(() => new Date()).notNull()
 });

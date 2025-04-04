@@ -13,13 +13,13 @@ import { activities } from "./activities";
 
 // 'cascade' | 'restrict' | 'no action' | 'set null' | 'set default';
 export const activitySlots = pgTable("activity_slots", {
-    activity_slot_id: uuid("activity_slot_id").defaultRandom().primaryKey(),
-    activity: uuid("activity").notNull().references(() => activities.activity_id, { onDelete: "cascade" }),
-    description: varchar("description"),
-    location: varchar("location"),
-    start: timestamp("start").notNull(),
-    end: timestamp("end").notNull(),
+    activity_slot_id: uuid().defaultRandom().primaryKey(),
+    activity: uuid().notNull().references(() => activities.activity_id, { onDelete: "cascade" }),
+    description: varchar(),
+    location: varchar(),
+    start: timestamp().notNull(),
+    end: timestamp().notNull(),
     
-    created_at: timestamp("created_at").defaultNow(),
-    updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull()
+    created_at: timestamp().defaultNow(),
+    updated_at: timestamp().defaultNow().$onUpdate(() => new Date()).notNull()
 });

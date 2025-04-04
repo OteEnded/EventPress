@@ -15,16 +15,16 @@ import { events } from "./events.js";
 
 // 'cascade' | 'restrict' | 'no action' | 'set null' | 'set default';
 export const booths = pgTable("booths", {
-    booth_id: uuid("booth_id").defaultRandom().primaryKey(),
-    event: uuid("event").notNull().references(() => events.event_id, { onDelete: "cascade" }),
-    name: varchar("name").notNull(),
-    description: varchar("description"),
-    location: varchar("location"),
-    contact_info: varchar("contact_info"),
-    booth_type: varchar("booth_type"),
+    booth_id: uuid().defaultRandom().primaryKey(),
+    event: uuid().notNull().references(() => events.event_id, { onDelete: "cascade" }),
+    name: varchar().notNull(),
+    description: varchar(),
+    location: varchar(),
+    contact_info: varchar(),
+    booth_type: varchar(),
     
     // web_page: uuid("web_page").references(() => webPages.web_page_id, { onDelete: "set null" }),
     
-    created_at: timestamp("created_at").defaultNow(),
-    updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull()
+    created_at: timestamp().defaultNow(),
+    updated_at: timestamp().defaultNow().$onUpdate(() => new Date()).notNull()
 });

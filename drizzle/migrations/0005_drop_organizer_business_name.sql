@@ -1,0 +1,1 @@
+ALTER TABLE "organizers" DROP COLUMN "business_name";

@@ -2,8 +2,8 @@ import { pgTable, uuid, varchar, timestamp } from "drizzle-orm/pg-core";
 import { users } from "./users.js";
 
 export const userCredentials = pgTable("user_credentials", {
-    user: uuid("user").primaryKey().references(() => users.user_id),
-    password_hash: varchar("password_hash").notNull(),
-    created_at: timestamp("created_at").defaultNow(),
-    updated_at: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull()
+    user: uuid().primaryKey().references(() => users.user_id),
+    password_hash: varchar().notNull(),
+    created_at: timestamp().defaultNow(),
+    updated_at: timestamp().defaultNow().$onUpdate(() => new Date()).notNull()
 });
