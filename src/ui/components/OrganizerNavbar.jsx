@@ -3,38 +3,26 @@
 import Link from "next/link";
 import Image from "next/image";
 import ThemeToggle from "./ThemeToggle";
-import { use, useEffect, useState } from "react";
-import { useTheme } from "../providers/ThemeProvider";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import eventPressLogo from "@public/eventpress-logo.png";
 import { signOut } from "next-auth/react";
-import { useSession } from "next-auth/react";
 
 export default function OrganizerNavbar() {
-    // const { theme, toggleTheme } = useTheme();
     const [userData, setUserData] = useState(null);
-
     const { data: session } = useSession();
-    // console.log(session);
-    
-    // const userData = await fetch("/api/data/user/user_id", {
-    //     method: "GET",
-    //     headers: {
-    //         "Content-Type": "application/json",
-    //     },
-    // });
-    
+
     useEffect(() => {
         const fetchUserData = async () => {
             if (userData) {
-                // If userData is already set, do nothing
                 return;
             }
-    
+
             if (!session?.user?.email) {
                 console.log("No session or email found");
                 return;
             }
-    
+
             try {
                 const response = await fetch("/api/data/user/get/identity_email", {
                     method: "POST",
@@ -43,56 +31,85 @@ export default function OrganizerNavbar() {
                     },
                     body: JSON.stringify({ identity_email: session.user.email }),
                 });
-    
+
                 if (!response.ok) {
                     throw new Error(`Failed to fetch user data: ${response.status}`);
                 }
-    
+
                 const data = await response.json();
                 setUserData(data.content);
             } catch (error) {
                 console.error("Error fetching user data:", error);
             }
         };
-    
+
         fetchUserData();
-    }, [session, userData]); // Add userData as a dependency
+    }, [session, userData]);
+
+    // Determine the username to display
+    const getDisplayName = () => {
+        if (!userData) return "Loading...";
+        const profile = userData.UserProfile;
+
+        if (!profile) {
+            return userData.identity_email;
+        }
+
+        if (profile.display_name) {
+            return profile.display_name;
+        }
+
+        return `${profile.firstname} ${profile.lastname}`;
+    };
 
     return (
-        <div className="px-2 py-1 flex justify-between items-center">
-            <div className="p-4 gap-4 flex">
+        <div className="px-4 py-2 flex justify-between items-center bg-gray-100 dark:bg-gray-800">
+            {/* Logo and Theme Toggle */}
+            <div className="flex items-center gap-4">
                 <Image
                     src={eventPressLogo}
                     alt="Event Press logo"
                     width={40}
                     height={40}
-                    // className="max-w-[40px] max-h-[40px]"
                 />
                 <ThemeToggle />
             </div>
 
-            {JSON.stringify(userData)}
-
-            <div className="flex gap-4">
+            {/* Login/Logout Buttons and User Info */}
+            <div className="flex items-center gap-4">
+                {userData && (
+                    <div className="text-right">
+                        <p className="text-lg font-semibold text-gray-700 dark:text-white">
+                            {getDisplayName()}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {userData.identity_email}
+                        </p>
+                    </div>
+                )}
+                {!userData && (
+                    <div className="text-gray-500 dark:text-gray-400">Loading...</div>
+                )}
                 {!session ? (
                     <>
                         <Link href="/organizer/staffinvitation">
-                            <button className="px-6 py-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
+                            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
                                 Staff Invitation Login
                             </button>
                         </Link>
                         <Link href="/organizer/login">
-                            <button className="px-6 py-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
+                            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
                                 Login
                             </button>
                         </Link>
                     </>
                 ) : (
-                    <a onClick={() => signOut({ redirect: true })}>
-                        <button className="px-6 py-3 bg-red-600 text-white rounded-lg text-lg font-semibold hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-400 transition">
-                            Logout
-                        </button>
-                    </a>
+                    <button
+                        onClick={() => signOut({ redirect: true })}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-400 transition"
+                    >
+                        Logout
+                    </button>
                 )}
             </div>
         </div>
