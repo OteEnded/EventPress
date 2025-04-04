@@ -8,6 +8,7 @@ import PrivacyPolicy from "@/ui/modals/PrivacyPolicy";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 export default function LoginForm() {
 
@@ -24,7 +25,7 @@ export default function LoginForm() {
     const router = useRouter();
 
     if (session) {
-        router.replace("/organizer");
+        redirect("/organizer");
     }
 
     const handleSubmit = async (e) => {
@@ -42,7 +43,7 @@ export default function LoginForm() {
                 return;
             } 
             
-            router.replace("/organizer");
+            redirect("/organizer");
 
         } catch (error) {
             setError("An error occurred. Please try again later.");

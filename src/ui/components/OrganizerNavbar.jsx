@@ -88,7 +88,7 @@ export default function OrganizerNavbar() {
                         </Link>
                     </>
                 ) : (
-                    <a onClick={() => signOut({ redirect: false })}>
+                    <a onClick={() => signOut({ redirect: true })}>
                         <button className="px-6 py-3 bg-red-600 text-white rounded-lg text-lg font-semibold hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-400 transition">
                             Logout
                         </button>
