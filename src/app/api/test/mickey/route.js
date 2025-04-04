@@ -12,7 +12,8 @@ export async function GET(req) {
     
     try {
         
-        const x = await (await User.getUserByUserId("dc966575-5a90-4335-9926-729c671dca98")).expand();
+        const user = await User.getUserByUserId("dc966575-5a90-4335-9926-729c671dca98")
+        const x = await user.expand();
         
         console.log("Test API");
         console.log(x);

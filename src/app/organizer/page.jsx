@@ -1,9 +1,17 @@
+import Event from "@/lib/models/Event";
+import User from "@/lib/models/User";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth/next-auth-options";
+
 export default async function OrganizerDashboardPage() {
+
+    const session = await getServerSession(authOptions);
+    const user = await User.getUserByIdentityEmail(session.user.email);
 
     const organize_name = "องค์กร"
     const event_name = "VitaminCNC"
     const event_description = "พวกเราทีม VitaminCNC จะมาช่วยน้องๆเสริมภูมิคุ้มกัน ซ้อมทำข้อสอบก่อนลงสนาม!! จากรุ่นพี่ผู้มีประสบการณ์ผ่าน"
-    
+    const event_of_user = await Event.getEventsOfUser(user.user_id);
 
     function get_events() {
         let result = [];
@@ -51,6 +59,11 @@ export default async function OrganizerDashboardPage() {
                     <h1 className="text-3xl font-semibold mb-8"> อีเวนต์ของฉัน </h1>
                     <div>
                         {get_organizes()}
+                    </div>
+                    <div>
+                        {
+                            JSON.stringify(event_of_user)
+                        }
                     </div>
                 </div>
             </div>
