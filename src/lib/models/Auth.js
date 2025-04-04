@@ -97,7 +97,61 @@ async function registerAsAttendee() {
     
 }
 
-async function login() {}
+async function login(req) {
+    
+    if (!req || typeof req !== "object") {
+        console.error("API ERROR: Invalid request body", req);
+        return null;
+    }
+    
+    
+    const requiredFields = [
+        "indentity_email",
+        "password",
+    ];
+    
+    // Check if all required fields are present
+    for (const field of requiredFields) {
+        if (!req[field]) {
+            console.error(`API ERROR: Missing required field: ${field}`, req);
+            return null;
+        }
+    }
+    
+    try {
+        const dbConnection = getConnection();
+        
+        const selectedUser = await dbConnection.select().from(users).where(eq(users.identity_email, req.indentity_email));
+        if (selectedUser.length < 1) {
+            console.error(`Cannot find the user with email: ${req.indentity_email}`);
+            return null;
+        }
+        
+        const targetUser = selectedUser[0];
+        const targetUserCredential = (await dbConnection.select().from(userCredentials).where(eq(userCredentials.user, targetUser.user_id)))[0];
+        if (!targetUserCredential) {
+            console.error(`Cannot find the user credentials for user with email: ${req.indentity_email}`);
+            return null;
+        }
+        const passwordMatch = await bcrypt.compare(req.password, targetUserCredential.password_hash);
+        if (!passwordMatch) {
+            console.error(`Password does not match for user with email: ${req.indentity_email}`);
+            return null;
+        }
+        
+        console.log("User authenticated:", targetUser);
+        
+        return {
+            email: targetUser.identity_email,
+        };
+        
+    }
+    catch (error) {
+        console.error(error);
+        return null;
+    }
+    
+}
 
 export default {
     registerAsOrganizer,

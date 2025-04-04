@@ -51,7 +51,7 @@ export default async function OrganizerDashboardPage() {
         let result = [];
         for (let organize of event_of_user){
             result.push(
-                <div key={`${organize["organizer_id"]}`}> 
+                <div key={`${organize["organizer"]["organizer_id"]}`}> 
                     {/* Add a unique key for each organize */}
                     <h2 className="text-2xl font-semibold mb-4 mt-4 text-gray-700 dark:text-white">
                         {organize.organizer.name}

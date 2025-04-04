@@ -16,7 +16,7 @@ export default function LoginForm() {
     const [isTermsOpen, setIsTermsOpen] = useState(false);
     const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
     
-    const [email, setEmail] = useState("");
+    const [indentity_email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
@@ -34,7 +34,7 @@ export default function LoginForm() {
         try {
             const res = await signIn("credentials", {
                 redirect: false,
-                email,
+                indentity_email ,
                 password,
             });
 

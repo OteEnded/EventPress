@@ -5,6 +5,7 @@ import { users, userCredentials } from "@/database/schema";
 import { eq } from 'drizzle-orm';
 import bcrypt from "bcryptjs";
 import projectutility from "@/lib/projectutility";
+import Auth from "@/lib/models/Auth";
 
 
 const config = projectutility.getConfig(false);
@@ -23,7 +24,7 @@ const authOptions = {
             // e.g. domain, username, password, 2FA token, etc.
             // You can pass any HTML attribute to the <input> tag through the object.
             credentials: {},
-            async authorize(credentials, req) {
+            async authorize(req) {
                 // You need to provide your own logic here that takes the credentials
                 // submitted and returns either a object representing a user or value
                 // that is false/null if the credentials are invalid.
@@ -31,42 +32,7 @@ const authOptions = {
                 // You can also use the `req` object to obtain additional parameters
                 // (i.e., the request IP address)
                
-                const { email, password } = credentials;
-                
-                try {
-                    
-                    const dbConnection = getConnection();
-                    const selectedUser = await dbConnection.select().from(users).where(eq(users.identity_email, email));
-                    if (selectedUser.length > 1) {
-                        console.error(`Multiple users found with the same email address. Email: ${email}`);
-                        return null;
-                    }
-                    if (selectedUser.length === 0) {
-                        console.error(`Cannot find the user with email: ${email}`);
-                        return null;
-                    }
-                    const targetUser = selectedUser[0];
-                    const targetUserCredential = (await dbConnection.select().from(userCredentials).where(eq(userCredentials.user, targetUser.user_id)))[0];
-                    if (!targetUserCredential) {
-                        console.error(`Cannot find the user credentials for user with email: ${email}`);
-                        return null;
-                    }
-
-                    const passwordMatch = await bcrypt.compare(password, targetUserCredential.password_hash);
-                    if (!passwordMatch) {
-                        console.error(`Password does not match for user with email: ${email}`);
-                        return null;
-                    }
-
-                    console.log("User authenticated:", targetUser);
-
-                    return {email: targetUser.identity_email, user_id: targetUser.user_id};
-
-                }
-                catch (error) {
-                    console.error(error);
-                    return null;
-                }
+                return await Auth.login(req)
 
             },
         }),

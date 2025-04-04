@@ -31,7 +31,7 @@ export default function OrganizerNavbar() {
             }
     
             if (!session?.user?.email) {
-                console.error("No session or email found");
+                console.log("No session or email found");
                 return;
             }
     
