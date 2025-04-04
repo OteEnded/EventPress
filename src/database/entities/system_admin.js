@@ -7,9 +7,10 @@ import { users } from "./users.js";
 [String] Note
 */
 
+// 'cascade' | 'restrict' | 'no action' | 'set null' | 'set default';
 export const userProfiles = pgTable("user_profiles", {
-    system_admin_id: uuid().primaryKey().references(() => users.user_id),
-    user: uuid().references(() => users.user_id),
+    system_admin_id: uuid().defaultRandom().primaryKey(),
+    user: uuid().references(() => users.user_id, { onDelete: 'cascade' }),
     note: varchar(),
     
     created_at: timestamp().defaultNow(),
