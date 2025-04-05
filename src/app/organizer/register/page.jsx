@@ -86,7 +86,7 @@ export default function OrganizerRegisterPage() {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-[#5E9BD6] dark:bg-gray-900 text-white px-6">
-            <header className="text-center mb-12">
+            <header className="text-center my-12 ">
                 <h1 className="text-5xl font-extrabold mb-4"> SIGN UP </h1>
                 <p className="text-lg dark:text-gray-300 max-w-2xl">
                     เข้าร่วม EventPress และเริ่มจัดการอีเวนต์ได้เลย.

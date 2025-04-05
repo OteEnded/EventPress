@@ -85,11 +85,11 @@ export default function OrganizerRegisterPage() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-[#5E9BD6] dark:bg-gray-900 text-white px-6">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#5E9BD6] dark:bg-gray-900 text-white p-12">
             <header className="text-center mb-12">
-                <h1 className="text-5xl font-extrabold mb-4"> SIGN UP </h1>
+                <h1 className="text-5xl font-extrabold mb-4"> ลงทะเบียนองค์กร </h1>
                 <p className="text-lg dark:text-gray-300 max-w-2xl">
-                    เข้าร่วม EventPress และเริ่มจัดการอีเวนต์ได้เลย.
+                    ลงทะเบียนองค์กรของคุณเพื่อเริ่มต้นการสร้างอีเวนต์บน EventPress
                 </p>
             </header>
 
@@ -107,137 +107,83 @@ export default function OrganizerRegisterPage() {
                         </div>
                     )}
 
+                    
                     <div className="mb-4">
                         <label
-                            htmlFor="firstname"
+                            htmlFor="organization_name"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            ชื่อองค์กร
+                            </label>
+                            <input
+                            type="text"
+                            id="organization_name"
+                            name="organization_name"
+                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            required></input>
+                    </div>
+
+
+                    <div className="mb-4">
+                        <label
+                            htmlFor="organization_description"
                             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            ชื่อจริง
+                        > คำอธิบายเกี่ยวกับองค์กร
+                        </label>
+                        <textarea
+                        type="text"
+                        id="organization_description"
+                        name="organization_description"
+                        className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        required></textarea>
+                    </div>
+
+                    <div className="mb-4">  
+                        <label htmlFor="website" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            เว็บไซต์องค์กร
                         </label>
                         <input
+                        type="text"
+                        id="website"
+                        name="website"
+                        className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        required></input>
+                    </div>
+                    
+                    <div className="mb-4">
+                        <label htmlFor="organization_email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            อีเมลองค์กร   
+                        </label>
+                        <input
+                        type="text"
+                        id="organization_email"
+                        name="organization_email"
+                        className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        required></input>
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="organization_phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            หมายเลขโทรศัพท์องค์กร
+                        </label>
+                        <input
+                        type="text"
+                        id="organization_phone"
+                        name="organization_phone"
+                        className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        required></input>
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="organization_address" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            ที่อยู่
+                        </label>
+                        <textarea
                             type="text"
-                            id="firstname"
-                            name="firstname"
+                            id="organization_address"
+                            name="organization_address"
                             className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             required
-                            onChange={(e) => setFirstname(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label
-                            htmlFor="lastname"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            นามสกุล
-                        </label>
-                        <input
-                            type="text"
-                            id="lastname"
-                            name="lastname"
-                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            required
-                            onChange={(e) => setLastname(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label
-                            htmlFor="display_name"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            ชื่อบัญชีผู้ใช้
-                        </label>
-                        <input
-                            type="text"
-                            id="display_name"
-                            name="display_name"
-                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            onChange={(e) => setDisplayName(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label
-                            htmlFor="age"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            อายุ
-                        </label>
-                        <input
-                            type="number"
-                            id="age"
-                            name="age"
-                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            onChange={(e) => setAge(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label
-                            htmlFor="phone_number"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            หมายเลขโทรศัพท์
-                        </label>
-                        <input
-                            type="text"
-                            id="phone_number"
-                            name="phone_number"
-                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:text-gray-300 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            onChange={(e) => setPhoneNumber(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label
-                            htmlFor="indentity_email"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            อีเมล
-                        </label>
-                        <input
-                            type="email"
-                            id="indentity_email"
-                            name="indentity_email"
-                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:text-gray-300 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            required
-                            onChange={(e) => setIndentityEmail(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label
-                            htmlFor="password"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            รหัสผ่าน
-                        </label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:text-gray-300 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm "
-                            required
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label
-                            htmlFor="password_confirm"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            ยืนยันรหัสผ่าน
-                        </label>
-                        <input
-                            type="password"
-                            id="password_confirm"
-                            name="password_confirm"
-                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:text-gray-300 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            required
-                            onChange={(e) => setPasswordConfirm(e.target.value)}
-                        />
+                        ></textarea>
                     </div>
 
                     <div className="mb-4">
@@ -280,14 +226,6 @@ export default function OrganizerRegisterPage() {
                         </button>
                     </div>
                 </form>
-                <p className="mt-4 text-gray-600 dark:text-gray-300">
-                    มีบัญชีอยู่แล้ว?{" "}
-                    <Link href="/organizer/login">
-                        <span className="text-blue-600 dark:text-blue-400 hover:underline">
-                            เข้าสู่ระบบเลย
-                        </span>
-                    </Link>
-                </p>
             </section>
 
             {/* Modals */}
