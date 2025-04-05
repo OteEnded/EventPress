@@ -70,11 +70,11 @@ export async function POST(req) {
             }
         }
         
-        // Check if organizer is a valid UUID
-        if (!projectutility.isValidUUID(request_body.organizer)) {
-            console.error("API ERROR: Invalid organizer UUID");
+        // Check if owner is a valid UUID
+        if (!projectutility.isValidUUID(request_body.owner)) {
+            console.error("API ERROR: Invalid user UUID");
             return NextResponse.json(
-                { error: "Invalid organizer UUID" },
+                { error: "Invalid user UUID" },
                 { status: 400 }
             );
         }
@@ -82,7 +82,7 @@ export async function POST(req) {
         // Check if the user exists in the database
         const userExists = await dbConnection.select()
             .from(users)
-            .where(eq(users.user_id, request_body.organizer))
+            .where(eq(users.user_id, request_body.owner))
         if (userExists.length === 0) {
             console.error("API ERROR: User does not exist");
             return NextResponse.json(

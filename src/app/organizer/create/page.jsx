@@ -1,86 +1,116 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Modal from "@/ui/modals/InformationModal";
 import TermsOfService from "@/ui/modals/TermsOfService";
 import PrivacyPolicy from "@/ui/modals/PrivacyPolicy";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
-export default function OrganizerRegisterPage() {
+export default function OrganizerCreatePage() {
+    
+    const [userData, setUserData] = useState(null);
+    
     const [isTermsOpen, setIsTermsOpen] = useState(false);
     const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
-    const [firstname, setFirstname] = useState("");
-    const [lastname, setLastname] = useState("");
-    const [displayName, setDisplayName] = useState("");
+    // State for organizer data
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
+    const [website, setWebsite] = useState("");
+    const [email, setEmail] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
-    const [age, setAge] = useState("");
-    const [indentityEmail, setIndentityEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [passwordConfirm, setPasswordConfirm] = useState("");
-    const [agreement, setAgreement] = useState(false);
+    const [address, setAddress] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     
     const { data: session } = useSession();
-    // const router = useRouter();
+    const router = useRouter();
 
-    // if (!session) {
-    //     redirect("/");
-    // }
+    if (!session) {
+        redirect("/organizer/login");
+    }
+    
+    useEffect(() => {
+            const fetchUserData = async () => {
+                if (userData) {
+                    return;
+                }
+    
+                if (!session?.user?.email) {
+                    console.log("No session or email found");
+                    return;
+                }
+    
+                try {
+                    const response = await fetch("/api/data/user/get/identity_email", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ identity_email: session.user.email }),
+                    });
+    
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch user data: ${response.status}`);
+                    }
+    
+                    const data = await response.json();
+                    setUserData(data.content);
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                }
+            };
+    
+            fetchUserData();
+        }, [session, userData]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!agreement) {
-            setError("Please agree to the terms and conditions.");
-            return;
-        }
-
-        if (password !== passwordConfirm) {
-            setError("Passwords do not match.");
-            return;
-        }
-
-        if (!firstname || !lastname || !indentityEmail || !password || !passwordConfirm) {
-            setError("Please fill in all required fields.");
+        if (!name) {
+            setError("กรุณากรอกชื่อองค์กร");
             return;
         }
 
         try {
-            const response = await fetch("/api/auth/register", {
+            
+            const response = await fetch("/api/data/organizer/create", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    indentity_email: indentityEmail,
-                    password,
-                    firstname,
-                    lastname,
-                    display_name: displayName,
+                    owner: userData.user_id, // Use the logged in user's ID as owner
+                    name,
+                    description,
+                    website,
+                    email,
                     phone_number: phoneNumber,
-                    age,
+                    address,
                 }),
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data);
+            const data = await response.json();
+            
+            if (response.ok && data.isSuccess) {
+                console.log("Organizer created:", data);
                 const form = e.target;
                 form.reset();
-                setError(null);
-                setSuccess("Registration successful.");
+                setError("");
+                setSuccess("สร้างองค์กรสำเร็จแล้ว กำลังนำคุณไปยังหน้าองค์กร...");
+                // Redirect after successful creation
+                setTimeout(() => {
+                    router.push(`/organizer/${data.content.organizer_id}`);
+                }, 2000);
             } else {
-                const data = await response.json();
-                setError(data.message);
+                setError(data.error || "เกิดข้อผิดพลาดในการสร้างองค์กร");
             }
         } catch (error) {
-            console.log("An error occurred while registering.", error);
-            setError("An error occurred while registering.");
+            console.log("An error occurred while creating organizer:", error);
+            setError("เกิดข้อผิดพลาดในการสร้างองค์กร");
         }
     };
 
@@ -107,21 +137,21 @@ export default function OrganizerRegisterPage() {
                         </div>
                     )}
 
-                    
                     <div className="mb-4">
                         <label
                             htmlFor="organization_name"
                             className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                             ชื่อองค์กร
-                            </label>
-                            <input
+                        </label>
+                        <input
                             type="text"
                             id="organization_name"
                             name="organization_name"
                             className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            required></input>
+                            required
+                            onChange={(e) => setName(e.target.value)}
+                        />
                     </div>
-
 
                     <div className="mb-4">
                         <label
@@ -130,11 +160,11 @@ export default function OrganizerRegisterPage() {
                         > คำอธิบายเกี่ยวกับองค์กร
                         </label>
                         <textarea
-                        type="text"
-                        id="organization_description"
-                        name="organization_description"
-                        className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        required></textarea>
+                            id="organization_description"
+                            name="organization_description"
+                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            onChange={(e) => setDescription(e.target.value)}
+                        ></textarea>
                     </div>
 
                     <div className="mb-4">  
@@ -142,11 +172,12 @@ export default function OrganizerRegisterPage() {
                             เว็บไซต์องค์กร
                         </label>
                         <input
-                        type="text"
-                        id="website"
-                        name="website"
-                        className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        required></input>
+                            type="text"
+                            id="website"
+                            name="website"
+                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            onChange={(e) => setWebsite(e.target.value)}
+                        />
                     </div>
                     
                     <div className="mb-4">
@@ -154,11 +185,12 @@ export default function OrganizerRegisterPage() {
                             อีเมลองค์กร   
                         </label>
                         <input
-                        type="text"
-                        id="organization_email"
-                        name="organization_email"
-                        className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        required></input>
+                            type="email"
+                            id="organization_email"
+                            name="organization_email"
+                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
                     </div>
 
                     <div className="mb-4">
@@ -166,11 +198,12 @@ export default function OrganizerRegisterPage() {
                             หมายเลขโทรศัพท์องค์กร
                         </label>
                         <input
-                        type="text"
-                        id="organization_phone"
-                        name="organization_phone"
-                        className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        required></input>
+                            type="text"
+                            id="organization_phone"
+                            name="organization_phone"
+                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                        />
                     </div>
 
                     <div className="mb-4">
@@ -178,43 +211,11 @@ export default function OrganizerRegisterPage() {
                             ที่อยู่
                         </label>
                         <textarea
-                            type="text"
                             id="organization_address"
                             name="organization_address"
                             className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            required
+                            onChange={(e) => setAddress(e.target.value)}
                         ></textarea>
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="flex items-center">
-                            <input
-                                type="checkbox"
-                                name="terms"
-                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                required
-                                onChange={(e) => setAgreement(e.target.checked)}
-                            />
-                            <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
-                                ฉันยอมรับ
-                                <button
-                                    type="button"
-                                    onClick={() => setIsTermsOpen(true)}
-                                    className="text-blue-600 dark:text-blue-400 hover:underline mx-1"
-                                >
-                                    นโยบายความเป็นส่วนตัว
-                                </button>
-                                และ
-                                <button
-                                    type="button"
-                                    onClick={() => setIsPrivacyOpen(true)}
-                                    className="text-blue-600 dark:text-blue-400 hover:underline mx-1"
-                                >
-                                    ข้อตกลงการใช้งาน
-                                </button>
-                                ของ EventPress
-                            </span>
-                        </label>
                     </div>
 
                     <div className="mb-6">
@@ -222,28 +223,12 @@ export default function OrganizerRegisterPage() {
                             type="submit"
                             className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition"
                         >
-                            ลงทะเบียน
+                            สร้างองค์กร
                         </button>
                     </div>
                 </form>
             </section>
 
-            {/* Modals */}
-            <Modal
-                isOpen={isTermsOpen}
-                onClose={() => setIsTermsOpen(false)}
-                title="Terms of Service"
-            >
-                <TermsOfService />
-            </Modal>
-
-            <Modal
-                isOpen={isPrivacyOpen}
-                onClose={() => setIsPrivacyOpen(false)}
-                title="Privacy Policy"
-            >
-                <PrivacyPolicy />
-            </Modal>
         </div>
     );
 }
