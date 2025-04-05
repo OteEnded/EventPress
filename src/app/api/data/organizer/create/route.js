@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getConnection } from "@/lib/dbconnector";
-import { events, organizers } from "@/database/schema";
-import { eq } from "drizzle-orm";
+import { events, organizers, users } from "@/database/schema";
+import { eq, or } from "drizzle-orm";
 import projectutility from "@/lib/projectutility";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/next-auth-options";
@@ -26,7 +26,7 @@ export async function POST(req) {
         let request_body;
         try {
             request_body = await req.json();
-            projectutility.log("Event create request body:", request_body);
+            projectutility.log("Organizer create request body:", request_body);
         } catch (error) {
             console.error("API ERROR: Failed to parse JSON body", error);
             return NextResponse.json(
@@ -43,19 +43,21 @@ export async function POST(req) {
         }
 
         // Ensure required fields exist
+        // owner: uuid().notNull().references(() => users.user_id, { onDelete: "cascade" }),
+        // name: text().notNull(),
+        // description: text(),
+        // website: text(),
+        // email: text(),
+        // phone_number: text(),
+        // address: text(),
         const requiredFields = [
+            "owner",
             "name",
-            "organizer",
-            // "id_name",
             // "description",
-            // "location",
-            // "start_date",
-            // "end_date",
-            // "start_time",
-            // "end_time",
-            // "capacity",
-            // "price",
-            // "contact_info"
+            // "website",
+            // "email",
+            // "phone_number",
+            // "address"
         ];
         
         for (const field of requiredFields) {
@@ -77,61 +79,41 @@ export async function POST(req) {
             );
         }
         
-        // Check if the organizer exists in the database
-        const organizerExists = await dbConnection.select()
-            .from(organizers)
-            .where(eq(organizers.organizer_id, request_body.organizer))
-        if (organizerExists.length === 0) {
-            console.error("API ERROR: Organizer does not exist");
+        // Check if the user exists in the database
+        const userExists = await dbConnection.select()
+            .from(users)
+            .where(eq(users.user_id, request_body.organizer))
+        if (userExists.length === 0) {
+            console.error("API ERROR: User does not exist");
             return NextResponse.json(
-                { error: "Organizer does not exist" },
+                { error: "User does not exist" },
                 { status: 400 }
             );
         }
         
-        // Check if id_name is unique when not null
-        if (request_body.id_name) {
-            const idNameExists = await dbConnection.select()
-                .from(events)
-                .where(eq(events.id_name, request_body.id_name))
-            
-            if (idNameExists.length > 0) {
-                console.error("API ERROR: id_name already exists");
-                return NextResponse.json(
-                    { error: "id_name already exists" },
-                    { status: 400 }
-                );
-            }
-        }
-        
         // Insert the event into the database
-        const eventData = {
-            organizer: request_body.organizer,
+        const organizerData = {
+            owner: request_body.owner,
             name: request_body.name,
-            id_name: request_body.id_name || null,
-            description: request_body.description || null,
-            location: request_body.location || null,
-            start_date: request_body.start_date || null,
-            end_date: request_body.end_date || null,
-            start_time: request_body.start_time || null,
-            end_time: request_body.end_time || null,
-            capacity: request_body.capacity || null,
-            price: request_body.price || 0.0,
-            contact_info: request_body.contact_info || null
+            description: request_body.description,
+            website: request_body.website,
+            email: request_body.email,
+            phone_number: request_body.phone_number,
+            address: request_body.address
         };
         
-        const result = await dbConnection.insert(events).values(eventData).returning();
+        const result = await dbConnection.insert(organizers).values(organizerData).returning();
         if (result.length === 0) {
-            console.error("API ERROR: Failed to create event");
+            console.error("API ERROR: Failed to create organizer");
             return NextResponse.json(
-                { error: "Failed to create event" },
+                { error: "Failed to create organizer" },
                 { status: 500 }
             );
         }
         
         projectutility.log("Event created:", result);
         return NextResponse.json(
-            { message: "Event created successfully", content: result[0], isSuccess: true },
+            { message: "Organizer created successfully", content: result[0], isSuccess: true },
             { status: 200 }
         );
         
