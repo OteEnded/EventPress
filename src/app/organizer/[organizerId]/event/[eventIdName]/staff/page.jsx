@@ -64,10 +64,7 @@ export default function OrganizerEventStaffIndexPage({ params }) {
                                 </div>
                                 <div className="flex gap-2">
                                     <button className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                                        แก้ไข    
-                                    </button>
-                                    <button className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
-                                        ลบ
+                                        จัดการสตาฟ    
                                     </button>
                                 </div>
 
