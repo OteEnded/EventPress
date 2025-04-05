@@ -9,6 +9,14 @@ import PrivacyPolicy from "@/ui/modals/PrivacyPolicy";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 
+// Add custom CSS to hide number input spinners
+const hideNumberInputSpinners = {
+    WebkitAppearance: "none",
+    MozAppearance: "textfield",
+    appearance: "textfield",
+    margin: 0
+};
+
 export default function OrganizerRegisterPage() {
     const [isTermsOpen, setIsTermsOpen] = useState(false);
     const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
@@ -24,13 +32,21 @@ export default function OrganizerRegisterPage() {
     const [agreement, setAgreement] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
-    
+
     const { data: session } = useSession();
-    // const router = useRouter();
 
     if (session) {
         redirect("/organizer");
     }
+
+    const handleAgeChange = (e) => {
+        const value = parseInt(e.target.value);
+        if (isNaN(value) || value < 0) {
+            setAge("0");
+        } else {
+            setAge(e.target.value);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -169,7 +185,10 @@ export default function OrganizerRegisterPage() {
                             id="age"
                             name="age"
                             className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            onChange={(e) => setAge(e.target.value)}
+                            onChange={handleAgeChange}
+                            value={age}
+                            min="0"
+                            style={hideNumberInputSpinners}
                         />
                     </div>
 

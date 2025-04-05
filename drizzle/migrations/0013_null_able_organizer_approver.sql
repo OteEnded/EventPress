@@ -1,0 +1,1 @@
+ALTER TABLE "organizers" ALTER COLUMN "approver" DROP NOT NULL;

@@ -20,6 +20,7 @@ export default function OrganizerDetailPage() {
     const [address, setAddress] = useState("");
     const [owner, setOwner] = useState("");
     const [ownerData, setOwnerData] = useState(null);
+    const [approver, setApprover] = useState(null); // Add state for approver
 
     // New state for logo
     const [logo, setLogo] = useState(null);
@@ -109,6 +110,11 @@ export default function OrganizerDetailPage() {
                 // Updated to use correct Events property name from API response
                 if (organizerData.Events && Array.isArray(organizerData.Events)) {
                     setEvents(organizerData.Events);
+                }
+
+                // Set approver if available
+                if (organizerData.approver) {
+                    setApprover(organizerData.approver);
                 }
 
                 // Update previous values for change detection
@@ -308,14 +314,21 @@ export default function OrganizerDetailPage() {
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
                         </svg>
-                        กลับไปยังหน้าองค์กร
+                        กลับไปยังหน้าหลัก
                     </button>
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-                    <h1 className="text-4xl lg:text-5xl font-extrabold mb-4 md:mb-0">
-                        ข้อมูลองค์กร
-                    </h1>
+                    <div className="flex items-center gap-4">
+                        <h1 className="text-4xl lg:text-5xl font-extrabold mb-4 md:mb-0">
+                            ข้อมูลองค์กร
+                        </h1>
+                        
+                        {/* Approval Status Badge */}
+                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${approver ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}>
+                            {approver ? 'ได้รับการอนุมัติแล้ว' : 'รอการอนุมัติ'}
+                        </div>
+                    </div>
                     
                     {isOwner && (
                         <div className="flex items-center gap-2">
@@ -526,6 +539,18 @@ export default function OrganizerDetailPage() {
                         </div>
                     )}
 
+                    {/* Approver info - read only */}
+                    {approver && (
+                        <div>
+                            <p className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                ผู้อนุมัติองค์กร
+                            </p>
+                            <p className="p-3 block w-full bg-gray-100 dark:bg-gray-700 rounded-md dark:text-white">
+                                {approver.firstname} {approver.lastname} ({approver.display_name || approver.indentity_email})
+                            </p>
+                        </div>
+                    )}
+
                     {/* Action buttons for owner */}
                     {isOwner && (
                         <div className="flex justify-end gap-4 pt-4">
@@ -585,7 +610,13 @@ export default function OrganizerDetailPage() {
                                     </p>
                                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
                                         <span className="mr-2">📅</span>
-                                        <span>{event.start_date ? new Date(event.start_date).toLocaleDateString('th-TH') : 'ไม่ระบุ'}</span>
+                                        {event.start_date && event.end_date ? (
+                                            <span>
+                                                {new Date(event.start_date).toLocaleDateString('th-TH')} - {new Date(event.end_date).toLocaleDateString('th-TH')}
+                                            </span>
+                                        ) : (
+                                            <span>{event.start_date ? new Date(event.start_date).toLocaleDateString('th-TH') : 'ไม่ระบุ'}</span>
+                                        )}
                                     </div>
                                     <Link 
                                         href={`/organizer/${organizerId}/event/${event.id_name || event.event_id}`}

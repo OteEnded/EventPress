@@ -3,6 +3,7 @@ import { getConnection } from "@/lib/dbconnector";
 import { events, organizers } from "@/database/schema";
 import { eq, or, and, not } from "drizzle-orm";
 import projectutility from "@/lib/projectutility";
+import Events from "@/lib/models/Event";
 
 /* res template
 { message: "", content: {}, isSuccess: true }
@@ -16,13 +17,6 @@ export async function POST(req, { params }) {
 
     try {
         const { eventId } = param;
-        if (!projectutility.isValidUUID(eventId)) {
-            console.error("API ERROR: Invalid event ID");
-            return NextResponse.json(
-                { error: "Invalid event ID" },
-                { status: 400 }
-            );
-        }
 
         let request_body;
         try {
@@ -76,6 +70,18 @@ export async function POST(req, { params }) {
             );
         }
         
+        // Check if the event exists in the database
+        const eventExists = await Events.getEventByIdName(eventId);
+        if (!eventExists) {
+            console.error("API ERROR: Event does not exist");
+            return NextResponse.json(
+                { error: "Event does not exist" },
+                { status: 404 }
+            );
+        }
+        const resolvedEventId = eventExists.event_id;
+        
+        
         // Check if id_name is a not existing id_name in the database
         if (request_body.id_name) {
             const idNameExists = await dbConnection.select()
@@ -83,7 +89,7 @@ export async function POST(req, { params }) {
                 .where(
                     and(
                         eq(events.id_name, request_body.id_name),
-                        not(eq(events.event_id, eventId))
+                        not(eq(events.event_id, resolvedEventId))
                     )
                 );
             
@@ -114,7 +120,7 @@ export async function POST(req, { params }) {
 
         const result = await dbConnection.update(events)
             .set(eventData)
-            .where(eq(events.event_id, eventId))
+            .where(eq(events.event_id, resolvedEventId))
             .returning();
 
         if (result.length === 0) {

@@ -28,56 +28,47 @@ export default async function OrganizerDashboardPage() {
 		let result = [];
 		for (let event of organize.events) {
 			result.push(
-				<div
-					key={`${event["event_id"]}`}
-					className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all hover:shadow-lg"
-				>
-					{/* Event Image Banner - Handle base64 or use placeholder */}
-					<div className="h-32 overflow-hidden">
-						{event.banner ? (
-							<img
-								src={event.banner}
-								alt={`${event.name} banner`}
-								className="w-full h-full object-cover"
-							/>
-						) : (
-							<div className="h-full w-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-white">
-								<span className="text-4xl">🎭</span>
+					<div 
+						key={event.event_id} 
+						className="bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition"
+					>
+						{/* Event Image Banner - Handle base64 or use placeholder */}
+						<div className="h-32 overflow-hidden">
+							{event.banner ? (
+								<img
+									src={event.banner}
+									alt={`${event.name} banner`}
+									className="w-full h-full object-cover"
+								/>
+							) : (
+								<div className="h-full w-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-white">
+									<span className="text-3xl">🎭</span>
+								</div>
+							)}
+						</div>
+						<div className="p-5">
+							<h3 className="text-xl font-semibold mb-2 truncate">{event.name}</h3>
+							<p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+								{event.description || "ไม่มีคำอธิบาย"}
+							</p>
+							<div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+								<span className="mr-2">📅</span>
+								{event.start_date && event.end_date ? (
+									<span>
+										{new Date(event.start_date).toLocaleDateString('th-TH')} - {new Date(event.end_date).toLocaleDateString('th-TH')}
+									</span>
+								) : (
+									<span>{event.start_date ? new Date(event.start_date).toLocaleDateString('th-TH') : 'ไม่ระบุ'}</span>
+								)}
 							</div>
-						)}
-					</div>
-					
-					<div className="p-6">
-						<h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{event.name}</h2>
-						
-						{/* Event Date */}
-						{event.start_date && (
-							<div className="flex items-center text-gray-600 dark:text-gray-300 mb-3">
-								<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-								</svg>
-								<span>{new Date(event.start_date).toLocaleDateString('th-TH')}</span>
-							</div>
-						)}
-						
-						{/* Event Description */}
-						<p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
-							{event.description || "ไม่มีคำอธิบายอีเวนต์"}
-						</p>
-						
-						{/* Action Button */}
-						<div className="flex justify-end mt-4">
-							<Link href={`/organizer/${organize["organizer"]["organizer_id"]}/event/${event["event_id"]}`}>
-								<button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition flex items-center">
-									<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-										<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-									</svg>
-									จัดการอีเวนต์
-								</button>
+							<Link 
+								href={`/organizer/${organize.organizer.organizer_id}/event/${event.id_name || event.event_id}`}
+								className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition w-full text-center"
+							>
+								จัดการอีเวนต์
 							</Link>
 						</div>
 					</div>
-				</div>
 			);
 		}
 		return result;
@@ -108,9 +99,15 @@ export default async function OrganizerDashboardPage() {
 									<h2 className="text-2xl font-bold text-gray-800 dark:text-white">
 										{organize.organizer.name}
 									</h2>
-									<p className="text-gray-600 dark:text-gray-400 text-sm">
-										{organize.organizer.description || "ไม่มีคำอธิบายองค์กร"}
-									</p>
+									<div className="flex items-center gap-2">
+										<p className="text-gray-600 dark:text-gray-400 text-sm">
+											{organize.organizer.description || "ไม่มีคำอธิบายองค์กร"}
+										</p>
+										{/* Approval Status Badge */}
+										<span className={`px-2 py-1 text-xs font-medium rounded-full ${organize.organizer.approver ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}>
+											{organize.organizer.approver ? 'ได้รับการอนุมัติ' : 'รอการอนุมัติ'}
+										</span>
+									</div>
 								</div>
 							</div>
 							
@@ -181,7 +178,7 @@ export default async function OrganizerDashboardPage() {
 				<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
 					<div>
 						<h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">
-							แดชบอร์ดองค์กร
+							แดชบอร์ด
 						</h1>
 						<p className="text-gray-600 dark:text-gray-300 mt-2">
 							จัดการองค์กรและอีเวนต์ของคุณได้ที่นี่

@@ -3,6 +3,14 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 
+// Add custom CSS to hide number input spinners
+const hideNumberInputSpinners = {
+    WebkitAppearance: "none",
+    MozAppearance: "textfield",
+    appearance: "textfield",
+    margin: 0
+};
+
 export default function OrganizerEventManagePage() {
     const { organizerId, eventIdName } = useParams(); // Access route params
     const router = useRouter();
@@ -19,6 +27,7 @@ export default function OrganizerEventManagePage() {
     const [eventCapacity, setEventCapacity] = useState("");
     const [eventLocation, setEventLocation] = useState("");
     const [contactInfo, setContactInfo] = useState("");
+    const [eventId, setEventId] = useState(""); // Store the actual event_id
 
     // Create a reference to store previous values
     const previousValues = useRef({
@@ -36,6 +45,7 @@ export default function OrganizerEventManagePage() {
     });
 
     const timeoutIdRef = useRef(null);
+    const isFirstRender = useRef(true);
 
     // State for autosave and error handling
     const saveStatusStatusStyleEnum = {
@@ -53,6 +63,49 @@ export default function OrganizerEventManagePage() {
 
     // State for booths
     const [booths, setBooths] = useState([]); // Initialize empty booth data
+
+    // Modified handler for price to prevent negative values
+    const handlePriceChange = (e) => {
+        const value = parseFloat(e.target.value);
+        if (isNaN(value) || value < 0) {
+            setEventPrice("0");
+        } else {
+            setEventPrice(e.target.value);
+        }
+    };
+
+    // Add validation for id_name to ensure URL-safe characters only
+    const handleIdNameChange = (e) => {
+        // Allow only letters, numbers, underscores, and hyphens (URL-safe characters)
+        const value = e.target.value;
+        // Replace any invalid characters with empty string
+        const sanitizedValue = value.replace(/[^a-zA-Z0-9_-]/g, '');
+        
+        // Update the state with sanitized value
+        setIdName(sanitizedValue);
+        
+        // Show tooltip or error message if the input was sanitized
+        if (value !== sanitizedValue) {
+            // Optional: Set a temporary error message or tooltip
+            const errorMsg = document.getElementById('id-name-error');
+            if (errorMsg) {
+                // errorMsg.textContent = 'ใช้ได้เฉพาะตัวอักษรภาษาอังกฤษ, ตัวเลข, ขีดล่าง (_) และเครื่องหมายขีด (-)';
+                errorMsg.classList.remove('text-gray-500');
+                errorMsg.classList.remove('dark:text-gray-400');
+                
+                errorMsg.classList.add('text-red-500');
+                
+                
+                // Hide the error after 3 seconds
+                setTimeout(() => {
+                    errorMsg.classList.add('text-gray-500');
+                    errorMsg.classList.add('dark:text-gray-400');
+                    errorMsg.classList.remove('text-red-500');
+                    errorMsg
+                }, 3000);
+            }
+        }
+    };
 
     // Fetch event data if editing an existing event
     useEffect(() => {
@@ -95,6 +148,7 @@ export default function OrganizerEventManagePage() {
                 setEventLocation(data.content.location || "");
                 setContactInfo(data.content.contact_info || "");
                 setBooths(data.content.Booths || []); // Set booths from the event data
+                setEventId(data.content.event_id || ""); // Set the actual event_id
             } catch (error) {
                 console.error("Error fetching event data:", error);
                 setError("An error occurred while fetching event data.");
@@ -104,110 +158,18 @@ export default function OrganizerEventManagePage() {
         fetchEventData();
     }, [eventIdName]);
 
-    // Create the autosave function with useCallback to prevent recreating it on every render
-    const autosave = useCallback(async () => {
-        console.log("Autosaving...");
-        try {
-            const payload = {
-                name: eventName,
-                id_name: idName,
-                description: eventDescription,
-                location: eventLocation,
-                start_date: startDate,
-                end_date: endDate,
-                start_time: startTime,
-                end_time: endTime,
-                capacity: eventCapacity,
-                price: eventPrice,
-                contact_info: contactInfo,
-                organizer: organizerId,
-            };
-
-            const response = await fetch(
-                eventIdName === "create"
-                    ? "/api/data/event/create"
-                    : `/api/data/event/update/${eventIdName}`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(payload),
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to save event data");
-            }
-
-            const result = await response.json();
-
-            // Redirect to the event page if we were in create mode and got a successful response with event data
-            if (
-                eventIdName === "create" &&
-                result.isSuccess &&
-                result.content &&
-                result.content.event_id
-            ) {
-                setSaveStatus({
-                    message: "บันทึกสำเร็จ กำลังเปลี่ยนเส้นทาง...",
-                    status: saveStatusStatusStyleEnum.SUCCESS,
-                });
-
-                // Short delay to show success message before redirect
-                setTimeout(() => {
-                    router.replace(
-                        `/organizer/${organizerId}/event/${result.content.event_id}`
-                    );
-                }, 1000);
-
-                return;
-            }
-
-            setSaveStatus({
-                message: "บันทึกสำเร็จ",
-                status: saveStatusStatusStyleEnum.SUCCESS,
-            });
-
-            // Reset success status after 3 seconds
-            setTimeout(() => {
-                setSaveStatus({
-                    message: "บันทึกแล้ว",
-                    status: saveStatusStatusStyleEnum.SUCCESS,
-                });
-            }, 3000);
-        } catch (error) {
-            console.error("Error saving event data:", error);
-            setSaveStatus({
-                message: "เกิดข้อผิดพลาดในการบันทึก",
-                status: saveStatusStatusStyleEnum.ERROR,
-            });
-        }
-    }, [
-        eventName,
-        idName,
-        eventDescription,
-        eventLocation,
-        startDate,
-        endDate,
-        startTime,
-        endTime,
-        eventCapacity,
-        eventPrice,
-        contactInfo,
-        organizerId,
-        eventIdName,
-        router,
-        saveStatusStatusStyleEnum,
-    ]);
-
-    // Use a separate effect for setting up the autosave timeout
+    // Autosave functionality with onUpdate trigger
     useEffect(() => {
-        // Only create the timeout if autosave is needed
-        if (notFound || (eventIdName === "create" && !eventName)) {
+        // Skip on first render to avoid unnecessary save
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
             return;
         }
 
+        // Skip autosave if we have a 404 error or on empty create mode
+        if (notFound || (eventIdName === "create" && !eventName)) return;
+
+        // Check if values have changed since last render
         const valuesChanged =
             previousValues.current.eventName !== eventName ||
             previousValues.current.idName !== idName ||
@@ -221,18 +183,26 @@ export default function OrganizerEventManagePage() {
             previousValues.current.eventPrice !== eventPrice ||
             previousValues.current.contactInfo !== contactInfo;
 
-        if (valuesChanged) {
-            console.log(
-                "Values changed, updating status and scheduling autosave"
-            );
+        console.log("Values changed:", valuesChanged);
 
-            // Update the status immediately
+        // Only update status and set timeout if values have changed
+        if (valuesChanged) {
+            console.log("Setting up autosave timeout");
+
+            // Clear any existing timeout to prevent multiple saves
+            if (timeoutIdRef.current) {
+                console.log("Clearing existing timeout");
+                clearTimeout(timeoutIdRef.current);
+                timeoutIdRef.current = null;
+            }
+
+            // Update the "pending save" status
             setSaveStatus({
                 message: "มีการแก้ไข กำลังบันทึก...",
                 status: saveStatusStatusStyleEnum.WARNING,
             });
 
-            // Update previous values
+            // Update the ref with current values for next comparison
             previousValues.current = {
                 eventName,
                 idName,
@@ -246,6 +216,131 @@ export default function OrganizerEventManagePage() {
                 eventPrice,
                 contactInfo,
             };
+
+            // Define autosave function to be called after timeout
+            const performAutosave = async () => {
+                console.log("Autosaving...");
+                try {
+                    const payload = {
+                        name: eventName,
+                        id_name: idName,
+                        description: eventDescription,
+                        location: eventLocation,
+                        start_date: startDate,
+                        end_date: endDate,
+                        start_time: startTime,
+                        end_time: endTime,
+                        capacity: eventCapacity,
+                        price: eventPrice,
+                        contact_info: contactInfo,
+                        organizer: organizerId,
+                    };
+
+                    const response = await fetch(
+                        eventIdName === "create"
+                            ? "/api/data/event/create"
+                            : `/api/data/event/update/${eventId || eventIdName}`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(payload),
+                        }
+                    );
+
+                    if (!response.ok) {
+                        throw new Error("Failed to save event data");
+                    }
+
+                    const result = await response.json();
+
+                    // Redirect to the event page if we were in create mode and got a successful response with event data
+                    if (
+                        eventIdName === "create" &&
+                        result.isSuccess &&
+                        result.content &&
+                        result.content.event_id
+                    ) {
+                        setSaveStatus({
+                            message: "บันทึกสำเร็จ กำลังเปลี่ยนเส้นทาง...",
+                            status: saveStatusStatusStyleEnum.SUCCESS,
+                        });
+
+                        // Short delay to show success message before redirect
+                        setTimeout(() => {
+                            router.replace(
+                                `/organizer/${organizerId}/event/${result.content.id_name || result.content.event_id}`
+                            );
+                        }, 1000);
+
+                        return;
+                    }
+
+                    // Check if the id_name has changed and we need to redirect
+                    if (
+                        eventIdName !== "create" &&
+                        result.isSuccess
+                    ) {
+                        // Case 1: id_name is removed (blank/null) but URL still has old id_name
+                        const idNameWasRemoved = (!idName || idName.trim() === '') && 
+                                                eventIdName !== eventId && 
+                                                eventId;
+                                                
+                        // Case 2: id_name was changed to something different
+                        const idNameWasChanged = idName && 
+                                               idName.trim() !== '' && 
+                                               idName !== eventIdName;
+                        
+                        if (idNameWasRemoved || idNameWasChanged) {
+                            setSaveStatus({
+                                message: "บันทึกสำเร็จ กำลังเปลี่ยนเส้นทาง...",
+                                status: saveStatusStatusStyleEnum.SUCCESS,
+                            });
+
+                            // Short delay to show success message before redirect
+                            setTimeout(() => {
+                                // If id_name was removed, use the event_id for the URL
+                                // If id_name was changed to something else, use the new id_name
+                                const newPath = idNameWasRemoved 
+                                    ? `/organizer/${organizerId}/event/${eventId}`
+                                    : `/organizer/${organizerId}/event/${idName}`;
+                                    
+                                console.log(`Redirecting to new path: ${newPath}`);
+                                router.replace(newPath);
+                            }, 1000);
+
+                            return;
+                        }
+                    }
+
+                    setSaveStatus({
+                        message: "บันทึกสำเร็จ",
+                        status: saveStatusStatusStyleEnum.SUCCESS,
+                    });
+
+                    // Reset success status after 3 seconds
+                    setTimeout(() => {
+                        setSaveStatus({
+                            message: "บันทึกแล้ว",
+                            status: saveStatusStatusStyleEnum.SUCCESS,
+                        });
+                    }, 3000);
+
+                    // Clear the timeout ref after execution
+                    timeoutIdRef.current = null;
+                } catch (error) {
+                    console.error("Error saving event data:", error);
+                    setSaveStatus({
+                        message: "เกิดข้อผิดพลาดในการบันทึก",
+                        status: saveStatusStatusStyleEnum.ERROR,
+                    });
+                    timeoutIdRef.current = null;
+                }
+            };
+
+            // Set timeout and store its ID in the ref
+            timeoutIdRef.current = setTimeout(performAutosave, 1500);
         }
     }, [
         eventName,
@@ -259,30 +354,23 @@ export default function OrganizerEventManagePage() {
         eventCapacity,
         eventPrice,
         contactInfo,
-        notFound,
         eventIdName,
+        organizerId,
+        router,
         saveStatusStatusStyleEnum,
+        notFound,
+        eventId,
     ]);
 
-    // Use a separate effect JUST for the timeout to avoid conflicts
+    // Ensure cleanup when component unmounts
     useEffect(() => {
-        if (notFound || (eventIdName === "create" && !eventName)) {
-            return;
-        }
-
-        // This effect only handles the timeout, not checking for changes
-        console.log("Setting up autosave timeout");
-        const timeoutId = setTimeout(() => {
-            console.log("Timeout triggered, executing autosave");
-            autosave();
-        }, 5000);
-
-        // Clean up on unmount or when dependencies change
         return () => {
-            console.log("Clearing timeout due to dependency change or unmount");
-            clearTimeout(timeoutId);
+            if (timeoutIdRef.current) {
+                console.log("Clearing timeout on unmount");
+                clearTimeout(timeoutIdRef.current);
+            }
         };
-    }, [autosave, notFound, eventIdName, eventName]);
+    }, []);
 
     // Handle 404 Event Not Found
     if (notFound) {
@@ -307,6 +395,26 @@ export default function OrganizerEventManagePage() {
             {/* Existing HTML structure */}
             <div className="min-h-screen flex flex-col bg-[#5E9BD6] text-gray-700 dark:bg-gray-900 px-6">
                 <div className="bg-white dark:bg-gray-800 dark:text-white p-16 border-primary mt-5 flex flex-col w-full">
+                    <div className="mb-8 mt-0">
+                        <button
+                            onClick={() => router.push("/organizer")}
+                            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-medium transition flex items-center gap-2"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                                    clipRule="evenodd"
+                                />
+                            </svg>
+                            กลับไปยังหน้าหลัก
+                        </button>
+                    </div>
                     <h1 className="flex flex-col text-5xl font-extrabold mb-4 items-center">
                         {eventIdName === "create"
                             ? "สร้างอีเวนต์"
@@ -363,9 +471,13 @@ export default function OrganizerEventManagePage() {
                                     id="id_name"
                                     name="id_name"
                                     value={idName}
-                                    onChange={(e) => setIdName(e.target.value)}
+                                    onChange={handleIdNameChange}
                                     className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    placeholder="ชื่อที่สั้นๆ ที่ใช้เรียกอีเวนต์ใน URL เช่น ku_openhouse_2025"
                                 />
+                                <p id="id-name-error" className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    ใช้ได้เฉพาะตัวอักษรภาษาอังกฤษ, ตัวเลข, ขีดล่าง (_) และเครื่องหมายขีด (-) เท่านั้น
+                                </p>
                             </div>
 
                             {/* Event Description */}
@@ -526,10 +638,10 @@ export default function OrganizerEventManagePage() {
                                     id="event_price"
                                     name="event_price"
                                     value={eventPrice}
-                                    onChange={(e) =>
-                                        setEventPrice(e.target.value)
-                                    }
+                                    onChange={handlePriceChange}
+                                    style={hideNumberInputSpinners}
                                     className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    min="0"
                                 />
                             </div>
 

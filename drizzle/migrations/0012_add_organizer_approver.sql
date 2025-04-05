@@ -1,0 +1,2 @@
+ALTER TABLE "organizers" ADD COLUMN "approver" uuid NOT NULL;--> statement-breakpoint
+ALTER TABLE "organizers" ADD CONSTRAINT "organizers_approver_users_user_id_fk" FOREIGN KEY ("approver") REFERENCES "public"."users"("user_id") ON DELETE set null ON UPDATE no action;

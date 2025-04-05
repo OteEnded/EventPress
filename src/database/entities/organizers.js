@@ -16,6 +16,8 @@ export const organizers = pgTable("organizers", {
     phone_number: text(),
     address: text(),
     
+    approver: uuid().references(() => users.user_id, { onDelete: "set null" }),
+    
     created_at: timestamp().defaultNow(),
     updated_at: timestamp().defaultNow().$onUpdate(() => new Date()).notNull()
 });
