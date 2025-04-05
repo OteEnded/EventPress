@@ -198,9 +198,39 @@ async function createEvent(req) {
     
 }
 
+async function getEventByIdName(idName) {
+    const dbConnection = getConnection();
+
+    if (!idName) {
+        throw new Error("ID Name is required.");
+    }
+    if (typeof idName !== "string") {
+        throw new Error("Invalid ID Name format.");
+    }
+    
+    try {
+        const eventFromID = await getEventByEventId(idName);
+        if (eventFromID) {
+            return eventFromID;
+        }
+    } catch (error) {}
+
+    const eventQueryResult = await dbConnection
+        .select()
+        .from(events)
+        .where(eq(events.id_name, idName));
+        
+    if (eventQueryResult.length === 0) {
+        return null;
+    }
+    return eventQueryResult[0];
+}
+
 export default {
     getEventByEventId,
     getEventsByOrganizerId,
     getEventsByOrganizer,
     getEventsOfUser,
+    createEvent,
+    getEventByIdName,
 };

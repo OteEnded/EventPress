@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, timestamp, real, uniqueIndex  } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, time, date, timestamp, real, uniqueIndex  } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { organizers } from "./organizers.js";
 import { Table } from "drizzle-orm";
@@ -13,8 +13,10 @@ export const events = pgTable("events", {
     id_name: text(),
     description: text(),
     location: text(),
-    start: timestamp(),
-    end: timestamp(),
+    start_date: date(),
+    end_date: date(),
+    start_time: time(),
+    end_time: time(),
     capacity: text(),
     price: real().default(0.0),
     contact_info: text(),

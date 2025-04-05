@@ -1,34 +1,35 @@
 import { NextResponse } from "next/server";
 import { getConnection } from "@/lib/dbconnector";
 import { events, organizers } from "@/database/schema";
-import { eq } from "drizzle-orm";
+import { eq, or, and, not } from "drizzle-orm";
 import projectutility from "@/lib/projectutility";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/next-auth-options";
 
 /* res template
 { message: "", content: {}, isSuccess: true }
 */
 
-export async function POST(req) {
+export async function POST(req, { params }) {
+    
+    const param = await params;
+    
+    const dbConnection = getConnection();
+
     try {
-        // Authentication check
-        const session = await getServerSession(authOptions);
-        if (!session) {
+        const { eventId } = param;
+        if (!projectutility.isValidUUID(eventId)) {
+            console.error("API ERROR: Invalid event ID");
             return NextResponse.json(
-                { error: "Unauthorized", isSuccess: false },
-                { status: 401 }
+                { error: "Invalid event ID" },
+                { status: 400 }
             );
         }
 
-        const dbConnection = getConnection();
-        
         let request_body;
         try {
             request_body = await req.json();
-            projectutility.log("Event create request body:", request_body);
+            projectutility.log("Event update request body:", request_body);
         } catch (error) {
-            console.error("API ERROR: Failed to parse JSON body", error);
+            console.error("API ERROR: Failed to parse JSON body", error, req);
             return NextResponse.json(
                 { error: "Invalid JSON body" },
                 { status: 400 }
@@ -43,21 +44,7 @@ export async function POST(req) {
         }
 
         // Ensure required fields exist
-        const requiredFields = [
-            "name",
-            "organizer",
-            // "id_name",
-            // "description",
-            // "location",
-            // "start_date",
-            // "end_date",
-            // "start_time",
-            // "end_time",
-            // "capacity",
-            // "price",
-            // "contact_info"
-        ];
-        
+        const requiredFields = ["name", "organizer"];
         for (const field of requiredFields) {
             if (!request_body[field]) {
                 console.error(`API ERROR: Missing field ${field}`);
@@ -67,7 +54,7 @@ export async function POST(req) {
                 );
             }
         }
-        
+
         // Check if organizer is a valid UUID
         if (!projectutility.isValidUUID(request_body.organizer)) {
             console.error("API ERROR: Invalid organizer UUID");
@@ -76,11 +63,11 @@ export async function POST(req) {
                 { status: 400 }
             );
         }
-        
+
         // Check if the organizer exists in the database
         const organizerExists = await dbConnection.select()
             .from(organizers)
-            .where(eq(organizers.organizer_id, request_body.organizer))
+            .where(eq(organizers.organizer_id, request_body.organizer));
         if (organizerExists.length === 0) {
             console.error("API ERROR: Organizer does not exist");
             return NextResponse.json(
@@ -89,11 +76,16 @@ export async function POST(req) {
             );
         }
         
-        // Check if id_name is unique when not null
+        // Check if id_name is a not existing id_name in the database
         if (request_body.id_name) {
             const idNameExists = await dbConnection.select()
                 .from(events)
-                .where(eq(events.id_name, request_body.id_name))
+                .where(
+                    and(
+                        eq(events.id_name, request_body.id_name),
+                        not(eq(events.event_id, eventId))
+                    )
+                );
             
             if (idNameExists.length > 0) {
                 console.error("API ERROR: id_name already exists");
@@ -103,10 +95,9 @@ export async function POST(req) {
                 );
             }
         }
-        
-        // Insert the event into the database
+
+        // Update the event in the database
         const eventData = {
-            organizer: request_body.organizer,
             name: request_body.name,
             id_name: request_body.id_name || null,
             description: request_body.description || null,
@@ -117,25 +108,29 @@ export async function POST(req) {
             end_time: request_body.end_time || null,
             capacity: request_body.capacity || null,
             price: request_body.price || 0.0,
-            contact_info: request_body.contact_info || null
+            contact_info: request_body.contact_info || null,
+            organizer: request_body.organizer
         };
-        
-        const result = await dbConnection.insert(events).values(eventData).returning();
+
+        const result = await dbConnection.update(events)
+            .set(eventData)
+            .where(eq(events.event_id, eventId))
+            .returning();
+
         if (result.length === 0) {
-            console.error("API ERROR: Failed to create event");
+            console.error("API ERROR: Failed to update event");
             return NextResponse.json(
-                { error: "Failed to create event" },
+                { error: "Failed to update event" },
                 { status: 500 }
             );
         }
-        
-        projectutility.log("Event created:", result);
+
+        projectutility.log("Event updated:", result);
         return NextResponse.json(
-            { message: "Event created successfully", content: result[0], isSuccess: true },
+            { message: "Event updated successfully", content: result[0], isSuccess: true },
             { status: 200 }
         );
-        
-        
+
     } catch (error) {
         console.error("API ERROR:", error);
         return NextResponse.json(

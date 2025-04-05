@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import User from "@/lib/models/User";
+import Event from "@/lib/models/Event";
 import projectutility from "@/lib/projectutility";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/next-auth-options";
@@ -34,18 +34,20 @@ export async function POST(req) {
             );
         }
         
-        const requiredFields = ["user_id"];
+        const requiredFields = ["event_id_name"];
         
-        const user = await User.getUserByUserId(request_body.user_id);
-        if (!user) {
+        const event = await Event.getEventByIdName(request_body.event_id_name);
+        if (!event) {
             return NextResponse.json(
-                { message: "User not found", isSuccess: false },
+                { message: "Event not found", isSuccess: false },
                 { status: 404 }
             );
         }
+        
+        console.log("Event data:", event);
 
         return NextResponse.json(
-            { message: "User retrieved successfully", content: user, isSuccess: true },
+            { message: "Event retrieved successfully", content: event, isSuccess: true },
             { status: 200 }
         );
         
