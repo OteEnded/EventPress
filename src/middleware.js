@@ -59,7 +59,7 @@ export async function middleware(req) {
         "register",
         "set-theme",
         "theme",
-        ""
+        "test"
     ];
     const isStaticBaseRoute = staticBaseRoutes.includes(urlPath[1]);
 
