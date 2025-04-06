@@ -3,6 +3,7 @@ import { getConnection } from "@/lib/dbconnector";
 import { users, organizers, events, booths } from "@/database/schema";
 import { eq, or, asc, desc } from "drizzle-orm";
 import Organizer from "./Organizer";
+import User from "./User";
 
 async function getEventByEventId(eventId) {
     const dbConnection = getConnection();
@@ -90,8 +91,23 @@ async function getEventsOfUser(userId) {
     const dbConnection = getConnection();
 
     const result = [];
-
-    const organizersOfUser = await Organizer.getOrganizersByOwnerUserId(userId);
+    const user = await User.getUserByUserId(userId);
+    
+    if (!user) {
+        throw new Error("User not found.");
+    }
+    let organizersOfUser;
+    if (user.SystemAdmin) {
+        // if user is system admin, get all organizers
+        organizersOfUser = await dbConnection
+            .select()
+            .from(organizers)
+            .orderBy(desc(organizers.created_at));
+    }
+    else {
+        // get all organizers of the user
+        organizersOfUser = await Organizer.getOrganizersByOwnerUserId(userId);
+    }
     
     if (organizersOfUser) {
         for (const organizer of organizersOfUser) {
@@ -106,8 +122,14 @@ async function getEventsOfUser(userId) {
         }
     }
     
+    if (user.SystemAdmin) {
+        return result;
+    }
+    
     // get events of the user
     // get events which the user is not the owner but is a participant
+    
+    
     
     return result;
 }

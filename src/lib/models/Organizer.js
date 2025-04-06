@@ -78,7 +78,7 @@ async function getOrganizersByOwnerUserId(ownerUserId) {
         throw new Error("User not found.");
     }
     
-    const organizerQueryResult = await dbConnection.select({organizer_id: organizers.organizer_id}).from(organizers).where(eq(organizers.owner, ownerUserId));
+    const organizerQueryResult = await dbConnection.select({organizer_id: organizers.organizer_id}).from(organizers).where(eq(organizers.owner, ownerUserId)).ordarBy(desc(organizers.created_at));
     if (organizerQueryResult.length === 0) {
         return null;
     }
