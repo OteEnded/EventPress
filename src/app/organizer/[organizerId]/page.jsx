@@ -395,7 +395,8 @@ export default function OrganizerDetailPage() {
                     </button>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 mb-6">
+                    {/* Logo Section */}
                     <h1 className="text-4xl lg:text-5xl font-extrabold mb-4 md:mb-0">
                         ข้อมูลองค์กร
                     </h1>
