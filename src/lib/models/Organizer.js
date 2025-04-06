@@ -1,7 +1,7 @@
 import projectutility from "@/lib/projectutility";
 import { getConnection } from "@/lib/dbconnector";
 import { users, userProfiles, organizers } from "@/database/schema";
-import { eq } from "drizzle-orm";
+import { eq, asc, desc } from "drizzle-orm";
 import Event from "@/lib/models/Event";
 
 async function getOrganizerByOrganizerId(organizerId) {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import DeleteEventModal from "@/ui/modals/DeleteEventModal";
 
@@ -10,6 +10,62 @@ const hideNumberInputSpinners = {
     MozAppearance: "textfield",
     appearance: "textfield",
     margin: 0
+};
+
+// Date utility functions for formatting between ISO format (required by input type="date") and dd/mm/yy display
+const formatDateForDisplay = (isoDateString) => {
+    if (!isoDateString) return "";
+    
+    const date = new Date(isoDateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear().toString().substring(2, 4); // Get only last 2 digits of year
+    
+    return `${day}/${month}/${year}`;
+};
+
+// Date utility functions for formatting to Thai format
+const formatDateToThaiDisplay = (isoDateString) => {
+    if (!isoDateString) return "";
+    
+    const date = new Date(isoDateString);
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear() + 543; // Convert to Buddhist Era (BE)
+    
+    const thaiMonths = [
+        "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+        "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+    ];
+    
+    return `${day} ${thaiMonths[month]} ${year}`;
+};
+
+// Function to format dates for display in the UI but keeping proper date inputs
+const getDisplayDate = (dateString) => {
+    if (!dateString) return { iso: "", display: "" };
+    
+    return {
+        iso: dateString, // The ISO format for the input value
+        display: formatDateToThaiDisplay(dateString) // The display format for showing to users
+    };
+};
+
+const parseDateFromDisplay = (displayDate) => {
+    if (!displayDate) return "";
+    
+    // Parse dd/mm/yy format to ISO format (YYYY-MM-DD)
+    const [day, month, year] = displayDate.split('/');
+    
+    // Assume 21st century for two-digit year
+    const fullYear = year.length === 2 ? `20${year}` : year;
+    
+    const dateObj = new Date(`${fullYear}-${month}-${day}`);
+    if (isNaN(dateObj.getTime())) {
+        return ""; // Invalid date
+    }
+    
+    return dateObj.toISOString().split('T')[0]; // Return as YYYY-MM-DD
 };
 
 export default function OrganizerEventManagePage() {
@@ -29,6 +85,92 @@ export default function OrganizerEventManagePage() {
     const [eventLocation, setEventLocation] = useState("");
     const [contactInfo, setContactInfo] = useState("");
     const [eventId, setEventId] = useState(""); // Store the actual event_id
+
+    // State for validations
+    const [dateTimeError, setDateTimeError] = useState(null);
+
+    // Create a function to validate dates and times
+    const validateDatesAndTimes = useCallback((startDate, endDate, startTime, endTime) => {
+        // Format today's date as YYYY-MM-DD for comparison
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayFormatted = today.toISOString().split('T')[0];
+        
+        // Validate start date is not before today
+        if (startDate && startDate < todayFormatted) {
+            return "วันที่เริ่มต้นไม่สามารถเป็นวันที่ผ่านมาแล้วได้";
+        }
+        
+        // Validate end date is not before start date
+        if (startDate && endDate && endDate < startDate) {
+            return "วันที่สิ้นสุดต้องเป็นวันเดียวกันหรือหลังวันที่เริ่มต้น";
+        }
+        
+        // If start date and end date are the same day, validate end time is not before start time
+        if (startDate && endDate && startDate === endDate && startTime && endTime && endTime < startTime) {
+            return "เวลาสิ้นสุดต้องเป็นเวลาหลังเวลาเริ่มต้น";
+        }
+        
+        return null; // Return null for no errors
+    }, []);
+
+    // Handle changes to start date
+    const handleStartDateChange = (e) => {
+        const newStartDate = parseDateFromDisplay(e.target.value);
+        setStartDate(newStartDate);
+        
+        // If end date exists and is now before the new start date, reset it to the start date
+        if (endDate && endDate < newStartDate) {
+            setEndDate(newStartDate); // Reset end date to match the new start date
+        }
+        
+        const error = validateDatesAndTimes(newStartDate, endDate, startTime, endTime);
+        setDateTimeError(error);
+    };
+
+    // Handle changes to end date
+    const handleEndDateChange = (e) => {
+        const newEndDate = parseDateFromDisplay(e.target.value);
+        
+        // Don't allow end date before start date
+        if (startDate && newEndDate < startDate) {
+            setDateTimeError("วันที่สิ้นสุดต้องเป็นวันเดียวกันหรือหลังวันที่เริ่มต้น");
+            return; // Don't update the end date if it's invalid
+        }
+        
+        setEndDate(newEndDate);
+        const error = validateDatesAndTimes(startDate, newEndDate, startTime, endTime);
+        setDateTimeError(error);
+    };
+
+    // Handle changes to start time
+    const handleStartTimeChange = (e) => {
+        const newStartTime = e.target.value;
+        setStartTime(newStartTime);
+        
+        // If on the same day and end time is now before start time, reset it to match start time
+        if (startDate && endDate && startDate === endDate && endTime && endTime < newStartTime) {
+            setEndTime(newStartTime); // Reset end time to match the new start time
+        }
+        
+        const error = validateDatesAndTimes(startDate, endDate, newStartTime, endTime);
+        setDateTimeError(error);
+    };
+
+    // Handle changes to end time
+    const handleEndTimeChange = (e) => {
+        const newEndTime = e.target.value;
+        
+        // Don't allow end time before start time on the same day
+        if (startDate && endDate && startDate === endDate && startTime && newEndTime < startTime) {
+            setDateTimeError("เวลาสิ้นสุดต้องเป็นเวลาหลังเวลาเริ่มต้น");
+            return; // Don't update the end time if it's invalid
+        }
+        
+        setEndTime(newEndTime);
+        const error = validateDatesAndTimes(startDate, endDate, startTime, newEndTime);
+        setDateTimeError(error);
+    };
 
     // Create a reference to store previous values
     const previousValues = useRef({
@@ -57,7 +199,7 @@ export default function OrganizerEventManagePage() {
     };
     const [saveStatus, setSaveStatus] = useState({
         message: "กรุณาตั้งชื่ออีเวนต์",
-        status: saveStatusStatusStyleEnum.WARNING,
+        status: saveStatusStatusStyleEnum.ERROR,
     });
     const [error, setError] = useState("");
     const [notFound, setNotFound] = useState(false); // For 404 handling
@@ -82,6 +224,27 @@ export default function OrganizerEventManagePage() {
     const handleIdNameChange = (e) => {
         // Allow only letters, numbers, underscores, and hyphens (URL-safe characters)
         const value = e.target.value;
+        
+        // Don't allow "create" as id_name
+        if (value.toLowerCase() === "create") {
+            const errorMsg = document.getElementById('id-name-error');
+            if (errorMsg) {
+                errorMsg.textContent = 'คำว่า "create" ไม่สามารถใช้เป็น ID Name ได้';
+                errorMsg.classList.remove('text-gray-500');
+                errorMsg.classList.remove('dark:text-gray-400');
+                errorMsg.classList.add('text-red-500');
+                
+                // Hide the error after 3 seconds
+                setTimeout(() => {
+                    errorMsg.textContent = 'ใช้ได้เฉพาะตัวอักษรภาษาอังกฤษ, ตัวเลข, ขีดล่าง (_) และเครื่องหมายขีด (-) เท่านั้น';
+                    errorMsg.classList.add('text-gray-500');
+                    errorMsg.classList.add('dark:text-gray-400');
+                    errorMsg.classList.remove('text-red-500');
+                }, 3000);
+            }
+            return;
+        }
+        
         // Replace any invalid characters with empty string
         const sanitizedValue = value.replace(/[^a-zA-Z0-9_-]/g, '');
         
@@ -93,7 +256,6 @@ export default function OrganizerEventManagePage() {
             // Optional: Set a temporary error message or tooltip
             const errorMsg = document.getElementById('id-name-error');
             if (errorMsg) {
-                // errorMsg.textContent = 'ใช้ได้เฉพาะตัวอักษรภาษาอังกฤษ, ตัวเลข, ขีดล่าง (_) และเครื่องหมายขีด (-)';
                 errorMsg.classList.remove('text-gray-500');
                 errorMsg.classList.remove('dark:text-gray-400');
                 
@@ -104,7 +266,6 @@ export default function OrganizerEventManagePage() {
                     errorMsg.classList.add('text-gray-500');
                     errorMsg.classList.add('dark:text-gray-400');
                     errorMsg.classList.remove('text-red-500');
-                    errorMsg
                 }, 3000);
             }
         }
@@ -186,17 +347,24 @@ export default function OrganizerEventManagePage() {
             previousValues.current.eventPrice !== eventPrice ||
             previousValues.current.contactInfo !== contactInfo;
 
-        console.log("Values changed:", valuesChanged);
-
         // Only update status and set timeout if values have changed
         if (valuesChanged) {
-            console.log("Setting up autosave timeout");
-
             // Clear any existing timeout to prevent multiple saves
             if (timeoutIdRef.current) {
-                console.log("Clearing existing timeout");
                 clearTimeout(timeoutIdRef.current);
                 timeoutIdRef.current = null;
+            }
+
+            // Perform validation check without setting state
+            const validationError = validateDatesAndTimes(startDate, endDate, startTime, endTime);
+            
+            if (validationError) {
+                // If validation fails, update save status to show error, but avoid setting dateTimeError here
+                setSaveStatus({
+                    message: "มีข้อมูลไม่ถูกต้อง กรุณาตรวจสอบวันที่และเวลา",
+                    status: saveStatusStatusStyleEnum.ERROR,
+                });
+                return; // Exit early - don't set up autosave
             }
 
             // Update the "pending save" status
@@ -222,8 +390,18 @@ export default function OrganizerEventManagePage() {
 
             // Define autosave function to be called after timeout
             const performAutosave = async () => {
-                console.log("Autosaving...");
                 try {
+                    // Check validation again just before saving without setting state
+                    const validationError = validateDatesAndTimes(startDate, endDate, startTime, endTime);
+                    if (validationError) {
+                        setSaveStatus({
+                            message: "มีข้อมูลไม่ถูกต้อง กรุณาตรวจสอบวันที่และเวลา",
+                            status: saveStatusStatusStyleEnum.ERROR,
+                        });
+                        timeoutIdRef.current = null;
+                        return;
+                    }
+
                     const payload = {
                         name: eventName,
                         id_name: idName,
@@ -309,7 +487,6 @@ export default function OrganizerEventManagePage() {
                                     ? `/organizer/${organizerId}/event/${eventId}`
                                     : `/organizer/${organizerId}/event/${idName}`;
                                     
-                                console.log(`Redirecting to new path: ${newPath}`);
                                 router.replace(newPath);
                             }, 1000);
 
@@ -333,7 +510,6 @@ export default function OrganizerEventManagePage() {
                     // Clear the timeout ref after execution
                     timeoutIdRef.current = null;
                 } catch (error) {
-                    console.error("Error saving event data:", error);
                     setSaveStatus({
                         message: "เกิดข้อผิดพลาดในการบันทึก",
                         status: saveStatusStatusStyleEnum.ERROR,
@@ -363,13 +539,13 @@ export default function OrganizerEventManagePage() {
         saveStatusStatusStyleEnum,
         notFound,
         eventId,
+        validateDatesAndTimes,
     ]);
 
     // Ensure cleanup when component unmounts
     useEffect(() => {
         return () => {
             if (timeoutIdRef.current) {
-                console.log("Clearing timeout on unmount");
                 clearTimeout(timeoutIdRef.current);
             }
         };
@@ -439,6 +615,13 @@ export default function OrganizerEventManagePage() {
                             >
                                 {`สถานะการบันทึก: ${saveStatus.message}`}
                             </div>
+
+                            {/* Display date and time validation error */}
+                            {dateTimeError && (
+                                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
+                                    {dateTimeError}
+                                </div>
+                            )}
 
                             {/* Event Name */}
                             <div className="mb-4">
@@ -539,12 +722,14 @@ export default function OrganizerEventManagePage() {
                                         id="start_date"
                                         name="start_date"
                                         value={startDate}
-                                        onChange={(e) =>
-                                            setStartDate(e.target.value)
-                                        }
+                                        onChange={(e) => handleStartDateChange(e)}
+                                        min={new Date().toISOString().split('T')[0]} // Set minimum date to today
                                         className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         required
                                     />
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        {startDate ? formatDateToThaiDisplay(startDate) : "วัน เดือน ปี"}
+                                    </p>
                                 </div>
 
                                 <div className="flex-1">
@@ -559,11 +744,13 @@ export default function OrganizerEventManagePage() {
                                         id="end_date"
                                         name="end_date"
                                         value={endDate}
-                                        onChange={(e) =>
-                                            setEndDate(e.target.value)
-                                        }
+                                        onChange={(e) => handleEndDateChange(e)}
+                                        min={startDate || new Date().toISOString().split('T')[0]} // Set minimum date to start date or today
                                         className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     />
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        {endDate ? formatDateToThaiDisplay(endDate) : "วัน เดือน ปี"}
+                                    </p>
                                 </div>
                             </div>
 
@@ -581,9 +768,7 @@ export default function OrganizerEventManagePage() {
                                         id="start_time"
                                         name="start_time"
                                         value={startTime}
-                                        onChange={(e) =>
-                                            setStartTime(e.target.value)
-                                        }
+                                        onChange={handleStartTimeChange}
                                         className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     />
                                 </div>
@@ -600,9 +785,7 @@ export default function OrganizerEventManagePage() {
                                         id="end_time"
                                         name="end_time"
                                         value={endTime}
-                                        onChange={(e) =>
-                                            setEndTime(e.target.value)
-                                        }
+                                        onChange={handleEndTimeChange}
                                         className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     />
                                 </div>
@@ -694,95 +877,99 @@ export default function OrganizerEventManagePage() {
                         </div>
                     </section>
                 </div>
-                <div id="booths" className="bg-white dark:bg-gray-800 p-8 lg:p-16 border-primary mt-5 flex flex-col w-full rounded-lg shadow-md">
-                    <section>
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-                            <h2 className="text-3xl font-bold dark:text-gray-300">รายการบูธ</h2>
-
-                            <button
-                                onClick={() =>
-                                    router.push(
-                                        `/organizer/${organizerId}/event/${eventIdName}/booth/create`
-                                    )
-                                }
-                                className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400 transition mt-4 md:mt-0"
-                            >
-                                + สร้างบูธใหม่
-                            </button>
-                        </div>
-                    </section>
-
-                    <section>
-                        {error && (
-                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
-                                {error}
-                            </div>
-                        )}
-                        
-                        {booths && booths.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {booths.map((booth) => (
-                                    <div 
-                                        key={booth.booth_id} 
-                                        className="bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition " //cursor-pointer"
-                                        // onClick={() => router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/${booth.id_name || booth.booth_id}`)}
-                                    >
-                                        {/* Booth Banner Image */}
-                                        <div className="h-40 overflow-hidden">
-                                            {booth.banner ? (
-                                                <img
-                                                    src={booth.banner}
-                                                    alt={`${booth.name} banner`}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="h-full w-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center text-white">
-                                                    <span className="text-3xl">🛒</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="p-5">
-                                            <h3 className="text-xl font-semibold mb-2 truncate dark:text-gray-200">{booth.name}</h3>
-                                            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
-                                                {booth.description || "ไม่มีคำอธิบาย"}
-                                            </p>
-                                            
-                                            {booth.capacity && (
-                                                <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
-                                                    <span className="mr-2">👥</span>
-                                                    <span>ความจุ: {booth.capacity}</span>
-                                                </div>
-                                            )}
-                                            
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/${booth.id_name || booth.booth_id}`);
-                                                }}
-                                                className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition w-full text-center"
-                                            >
-                                                จัดการบูธ
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-12 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                                <div className="text-4xl mb-4">🛒</div>
-                                <h3 className="text-xl font-medium mb-2">ยังไม่มีบูธ</h3>
-                                <p className="text-gray-600 dark:text-gray-400 mb-6">เพิ่มบูธเพื่อให้ผู้เข้าร่วมอีเวนต์สามารถลงทะเบียนเข้าร่วมได้</p>
+                
+                {/* Only show booths section when not in create mode */}
+                {eventIdName !== "create" && (
+                    <div id="booths" className="bg-white dark:bg-gray-800 p-8 lg:p-16 border-primary mt-5 flex flex-col w-full rounded-lg shadow-md">
+                        <section>
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                                <h2 className="text-3xl font-bold dark:text-gray-300">รายการบูธ</h2>
 
                                 <button
-                                    onClick={() => router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/create`)}
-                                    className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition"
+                                    onClick={() =>
+                                        router.push(
+                                            `/organizer/${organizerId}/event/${eventIdName}/booth/create`
+                                        )
+                                    }
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400 transition mt-4 md:mt-0"
                                 >
                                     + สร้างบูธใหม่
                                 </button>
                             </div>
-                        )}
-                    </section>
-                </div>
+                        </section>
+
+                        <section>
+                            {error && (
+                                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
+                                    {error}
+                                </div>
+                            )}
+                            
+                            {booths && booths.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {booths.map((booth) => (
+                                        <div 
+                                            key={booth.booth_id} 
+                                            className="bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition " //cursor-pointer"
+                                            // onClick={() => router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/${booth.id_name || booth.booth_id}`)}
+                                        >
+                                            {/* Booth Banner Image */}
+                                            <div className="h-40 overflow-hidden">
+                                                {booth.banner ? (
+                                                    <img
+                                                        src={booth.banner}
+                                                        alt={`${booth.name} banner`}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="h-full w-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center text-white">
+                                                        <span className="text-3xl">🛒</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="p-5">
+                                                <h3 className="text-xl font-semibold mb-2 truncate dark:text-gray-200">{booth.name}</h3>
+                                                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                                                    {booth.description || "ไม่มีคำอธิบาย"}
+                                                </p>
+                                                
+                                                {booth.capacity && (
+                                                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                                                        <span className="mr-2">👥</span>
+                                                        <span>ความจุ: {booth.capacity}</span>
+                                                    </div>
+                                                )}
+                                                
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/${booth.id_name || booth.booth_id}`);
+                                                    }}
+                                                    className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition w-full text-center"
+                                                >
+                                                    จัดการบูธ
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-12 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                    <div className="text-4xl mb-4">🛒</div>
+                                    <h3 className="text-xl font-medium mb-2">ยังไม่มีบูธ</h3>
+                                    <p className="text-gray-600 dark:text-gray-400 mb-6">เพิ่มบูธเพื่อให้ผู้เข้าร่วมอีเวนต์สามารถลงทะเบียนเข้าร่วมได้</p>
+
+                                    <button
+                                        onClick={() => router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/create`)}
+                                        className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition"
+                                    >
+                                        + สร้างบูธใหม่
+                                    </button>
+                                </div>
+                            )}
+                        </section>
+                    </div>
+                )}
             </div>
             <DeleteEventModal
                 isOpen={isDeleteModalOpen}

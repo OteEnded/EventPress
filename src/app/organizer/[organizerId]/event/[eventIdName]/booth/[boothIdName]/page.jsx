@@ -3,6 +3,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import DeleteBoothModal from "@/ui/modals/DeleteBoothModal";
+import CreateActivity from "@/ui/modals/CreateActivity";
+import EditActivity from "@/ui/modals/EditActivity";
+import DeleteActivityModal from "@/ui/modals/DeleteActivityModal";
 
 // Add custom CSS to hide number input spinners
 const hideNumberInputSpinners = {
@@ -59,10 +62,39 @@ export default function OrganizerBoothManagePage() {
     // State for delete booth modal
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+    // State for activity modals
+    const [isCreateActivityModalOpen, setIsCreateActivityModalOpen] = useState(false);
+    const [isEditActivityModalOpen, setIsEditActivityModalOpen] = useState(false);
+    const [isDeleteActivityModalOpen, setIsDeleteActivityModalOpen] = useState(false);
+    const [selectedActivityId, setSelectedActivityId] = useState("");
+    const [selectedActivityName, setSelectedActivityName] = useState("");
+    const [selectedActivityData, setSelectedActivityData] = useState(null);
+
     // Add validation for id_name to ensure URL-safe characters only
     const handleIdNameChange = (e) => {
         // Allow only letters, numbers, underscores, and hyphens (URL-safe characters)
         const value = e.target.value;
+        
+        // Don't allow "create" as id_name
+        if (value.toLowerCase() === "create") {
+            const errorMsg = document.getElementById('id-name-error');
+            if (errorMsg) {
+                errorMsg.textContent = 'คำว่า "create" ไม่สามารถใช้เป็น ID Name ได้';
+                errorMsg.classList.remove('text-gray-500');
+                errorMsg.classList.remove('dark:text-gray-400');
+                errorMsg.classList.add('text-red-500');
+                
+                // Hide the error after 3 seconds
+                setTimeout(() => {
+                    errorMsg.textContent = 'ใช้ได้เฉพาะตัวอักษรภาษาอังกฤษ, ตัวเลข, ขีดล่าง (_) และเครื่องหมายขีด (-) เท่านั้น';
+                    errorMsg.classList.add('text-gray-500');
+                    errorMsg.classList.add('dark:text-gray-400');
+                    errorMsg.classList.remove('text-red-500');
+                }, 3000);
+            }
+            return;
+        }
+        
         // Replace any invalid characters with empty string
         const sanitizedValue = value.replace(/[^a-zA-Z0-9_-]/g, '');
         
@@ -460,7 +492,7 @@ export default function OrganizerBoothManagePage() {
 
                             {/* Display save status */}
                             <div
-                                className={`text-right text-sm bg-gray mb-4 ${saveStatus.status}`}
+                                className={`text-right text-sm mb-4 ${saveStatus.status}`}
                             >
                                 {`สถานะการบันทึก: ${saveStatus.message}`}
                             </div>
@@ -601,103 +633,128 @@ export default function OrganizerBoothManagePage() {
                     </section>
                 </div>
                 
-                {/* Activities Section */}
-                <div className="bg-white dark:bg-gray-800 p-8 lg:p-16 border-primary mt-5 flex flex-col w-full rounded-lg shadow-md">
-                    <section>
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-                            <h2 className="text-3xl font-bold">รายการกิจกรรม</h2>
-
-                            <button
-                                onClick={() => router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/${boothIdName}/activity/create`)}
-                                className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400 transition mt-4 md:mt-0"
-                            >
-                                + สร้างกิจกรรมใหม่
-                            </button>
-                        </div>
-                    </section>
-
-                    <section>
-                        {error && (
-                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
-                                {error}
-                            </div>
-                        )}
-                        
-                        {activities && activities.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {activities.map((activity) => (
-                                    <div 
-                                        key={activity.activity_id} 
-                                        className="bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition cursor-pointer"
-                                        onClick={() => router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/${boothIdName}/activity/${activity.activity_id}`)}
-                                    >
-                                        {/* Activity Colored Header */}
-                                        <div className="h-16 overflow-hidden bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white">
-                                            <span className="text-2xl">🎯</span>
-                                        </div>
-                                        <div className="p-5">
-                                            <h3 className="text-xl font-semibold mb-2 truncate">{activity.name}</h3>
-                                            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
-                                                {activity.description || "ไม่มีคำอธิบาย"}
-                                            </p>
-                                            
-                                            {/* Activity Time and Location */}
-                                            <div className="space-y-2 mb-4">
-                                                {activity.location && (
-                                                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                                                        <span className="mr-2">📍</span>
-                                                        <span>{activity.location}</span>
-                                                    </div>
-                                                )}
-                                                
-                                                {(activity.start_time || activity.end_time) && (
-                                                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                                                        <span className="mr-2">🕒</span>
-                                                        <span>
-                                                            {activity.start_time && activity.end_time ? 
-                                                                `${activity.start_time.slice(0, 5)} - ${activity.end_time.slice(0, 5)}` : 
-                                                                activity.start_time ? activity.start_time.slice(0, 5) : activity.end_time.slice(0, 5)}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                
-                                                {activity.price > 0 && (
-                                                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                                                        <span className="mr-2">💰</span>
-                                                        <span>{activity.price} บาท</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/${boothIdName}/activity/${activity.activity_id}`);
-                                                }}
-                                                className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition w-full text-center"
-                                            >
-                                                จัดการกิจกรรม
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-12 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                                <div className="text-4xl mb-4">🎯</div>
-                                <h3 className="text-xl font-medium mb-2">ยังไม่มีกิจกรรม</h3>
-                                <p className="text-gray-600 dark:text-gray-400 mb-6">เพิ่มกิจกรรมเพื่อให้ผู้เข้าร่วมบูธได้มีส่วนร่วม</p>
+                {/* Only show activities section when not in create mode */}
+                {boothIdName !== "create" && (
+                    <div className="bg-white dark:bg-gray-800 p-8 lg:p-16 border-primary mt-5 flex flex-col w-full rounded-lg shadow-md">
+                        <section>
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                                <h2 className="text-3xl font-bold text-gray-700 dark:text-gray-100">รายการกิจกรรม</h2>
 
                                 <button
-                                    onClick={() => router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/${boothIdName}/activity/create`)}
-                                    className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition"
+                                    onClick={() => setIsCreateActivityModalOpen(true)}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400 transition mt-4 md:mt-0"
                                 >
                                     + สร้างกิจกรรมใหม่
                                 </button>
                             </div>
-                        )}
-                    </section>
-                </div>
+                        </section>
+
+                        <section>
+                            {error && (
+                                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
+                                    {error}
+                                </div>
+                            )}
+                            
+                            {activities && activities.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                    {activities.map((activity) => (
+                                        <div 
+                                            key={activity.activity_id} 
+                                            className="bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition cursor-pointer flex flex-col h-full"
+                                        >
+                                            <div className="p-5 flex flex-col flex-grow">
+                                                <h3 className="text-xl font-semibold mb-2 truncate flex items-center text-gray-700 dark:text-gray-200">
+                                                    <span className="text-xl mr-2">🎯</span>
+                                                    {activity.name}
+                                                </h3>
+                                                
+                                                <div className="bg-gray-200 dark:bg-gray-600 h-0.5 w-full mb-3"></div>
+                                                
+                                                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-4">
+                                                    {activity.description || "ไม่มีคำอธิบาย"}
+                                                </p>
+                                                
+                                                {/* Activity details */}
+                                                <div className="space-y-2 mt-auto mb-4">
+                                                    {activity.location && (
+                                                        <div className="flex items-start text-sm text-gray-500 dark:text-gray-400">
+                                                            <span className="mr-2 flex-shrink-0">📍</span>
+                                                            <span className="break-words">{activity.location}</span>
+                                                        </div>
+                                                    )}
+                                                    
+                                                    {(activity.start_time || activity.end_time) && (
+                                                        <div className="flex items-start text-sm text-gray-500 dark:text-gray-400">
+                                                            <span className="mr-2 flex-shrink-0">🕒</span>
+                                                            <span>
+                                                                {activity.start_time && activity.end_time ? 
+                                                                    `${activity.start_time.slice(0, 5)} - ${activity.end_time.slice(0, 5)}` : 
+                                                                    activity.start_time ? activity.start_time.slice(0, 5) : activity.end_time.slice(0, 5)}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                    
+                                                    {activity.price > 0 ? (
+                                                        <div className="flex items-start text-sm text-gray-500 dark:text-gray-400">
+                                                            <span className="mr-2 flex-shrink-0">💰</span>
+                                                            <span>{activity.price} บาท</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-start text-sm text-green-500 dark:text-green-400">
+                                                            <span className="mr-2 flex-shrink-0">✓</span>
+                                                            <span>เข้าร่วมฟรี</span>
+                                                        </div>
+                                                    )}
+                                                    
+                                                    {/* Add more details - Created/Updated timestamp */}
+                                                    {activity.created_at && (
+                                                        <div className="flex items-start text-sm text-gray-500 dark:text-gray-400">
+                                                            <span className="mr-2 flex-shrink-0">🆕</span>
+                                                            <span>สร้างเมื่อ: {new Date(activity.created_at).toLocaleString('th-TH', {
+                                                                year: 'numeric',
+                                                                month: 'short',
+                                                                day: 'numeric',
+                                                            })}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                
+                                                <div className="mt-auto">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setSelectedActivityId(activity.activity_id);
+                                                            setSelectedActivityName(activity.name);
+                                                            setSelectedActivityData(activity);
+                                                            setIsEditActivityModalOpen(true);
+                                                        }}
+                                                        className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition w-full text-center"
+                                                    >
+                                                        จัดการกิจกรรม
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-12 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                    <div className="text-4xl mb-4">🎯</div>
+                                    <h3 className="text-xl font-medium mb-2">ยังไม่มีกิจกรรม</h3>
+                                    <p className="text-gray-600 dark:text-gray-400 mb-6">เพิ่มกิจกรรมเพื่อให้ผู้เข้าร่วมบูธได้มีส่วนร่วม</p>
+
+                                    <button
+                                        onClick={() => setIsCreateActivityModalOpen(true)}
+                                        className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition"
+                                    >
+                                        + สร้างกิจกรรมใหม่
+                                    </button>
+                                </div>
+                            )}
+                        </section>
+                    </div>
+                )}
             </div>
             
             {/* Delete Booth Modal */}
@@ -711,6 +768,28 @@ export default function OrganizerBoothManagePage() {
                     organizerId={organizerId}
                 />
             )}
+            
+            {/* Activity Modals */}
+            <CreateActivity 
+                isOpen={isCreateActivityModalOpen}
+                onClose={() => setIsCreateActivityModalOpen(false)}
+                boothId={boothId || boothIdName}
+            />
+            
+            <EditActivity
+                isOpen={isEditActivityModalOpen}
+                onClose={() => setIsEditActivityModalOpen(false)}
+                activityId={selectedActivityId}
+                initialData={selectedActivityData}
+            />
+            
+            <DeleteActivityModal
+                isOpen={isDeleteActivityModalOpen}
+                onClose={() => setIsDeleteActivityModalOpen(false)}
+                activityId={selectedActivityId}
+                activityName={selectedActivityName}
+                boothId={boothId || boothIdName}
+            />
         </>
     );
 }

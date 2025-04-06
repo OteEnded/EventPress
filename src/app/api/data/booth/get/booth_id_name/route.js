@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getConnection } from "@/lib/dbconnector";
 import { booths, activities } from "@/database/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, asc, desc } from "drizzle-orm";
 import projectutility from "@/lib/projectutility";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/next-auth-options";
@@ -98,7 +98,10 @@ export async function POST(req) {
         const activitiesList = await dbConnection
             .select()
             .from(activities)
-            .where(eq(activities.booth, booth.booth_id));
+            .where(eq(activities.booth, booth.booth_id))
+            .orderBy(
+                desc(activities.created_at),
+            );
         
         booth.Activities = activitiesList;
         

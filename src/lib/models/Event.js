@@ -1,7 +1,7 @@
 import projectutility from "@/lib/projectutility";
 import { getConnection } from "@/lib/dbconnector";
 import { users, organizers, events, booths } from "@/database/schema";
-import { eq, or } from "drizzle-orm";
+import { eq, or, asc, desc } from "drizzle-orm";
 import Organizer from "./Organizer";
 
 async function getEventByEventId(eventId) {
@@ -26,7 +26,8 @@ async function getEventByEventId(eventId) {
     const boothsQueryResult = await dbConnection
         .select()
         .from(booths)
-        .where(eq(booths.event, eventId));
+        .where(eq(booths.event, eventId))
+        .orderBy(desc(booths.created_at));
     eventQueryResult[0].Booths = boothsQueryResult;
 
     
@@ -46,7 +47,8 @@ async function getEventsByOrganizerId(organizerId) {
     const eventQueryResult = await dbConnection
         .select()
         .from(events)
-        .where(eq(events.organizer, organizerId));
+        .where(eq(events.organizer, organizerId))
+        .orderBy(desc(events.created_at));
     // if (eventQueryResult.length === 0) {
     //     return null;
     // }
