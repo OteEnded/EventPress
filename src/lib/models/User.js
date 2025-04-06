@@ -1,6 +1,6 @@
 import projectutility from "@/lib/projectutility";
 import { getConnection } from "@/lib/dbconnector";
-import { users, userProfiles, userCredentials, userSigninMethods } from "@/database/schema";
+import { users, userProfiles, userCredentials, userSigninMethods, systemAdmins } from "@/database/schema";
 import { eq } from "drizzle-orm";
 import Organizer from "./Organizer";
 
@@ -26,9 +26,16 @@ async function getUserByUserId(userId) {
         return null;
     }
     
+    let userSystemAdmin = null;
+    const systemAdminQueryResult = await dbConnection.select().from(systemAdmins).where(eq(systemAdmins.user, userId));
+    if (systemAdminQueryResult.length > 0) {
+        userSystemAdmin = systemAdminQueryResult[0];
+    }
+    
     return {
         ...userQueryResult[0],
         UserProfile: await getUserProfileByUserId(userId),
+        SystemAdmin: userSystemAdmin,
         expand: async function() {
             return await expandUser(this.user_id);
         }

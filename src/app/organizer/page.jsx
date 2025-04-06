@@ -100,15 +100,13 @@ export default async function OrganizerDashboardPage() {
 									<h2 className="text-2xl font-bold text-gray-800 dark:text-white">
 										{organize.organizer.name}
 									</h2>
-									<div className="flex items-center gap-2">
-										<p className="text-gray-600 dark:text-gray-400 text-sm">
-											{organize.organizer.description || "ไม่มีคำอธิบายองค์กร"}
-										</p>
-										{/* Approval Status Badge */}
-										<span className={`px-2 py-1 text-xs font-medium rounded-full ${organize.organizer.approver ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}>
-											{organize.organizer.approver ? 'ได้รับการอนุมัติ' : 'รอการอนุมัติ'}
-										</span>
-									</div>
+									<p className="text-gray-600 dark:text-gray-400 text-sm">
+										{organize.organizer.description || "ไม่มีคำอธิบายองค์กร"}
+									</p>
+									{/* Approval Status Badge */}
+									<span className={`mt-1 inline-block px-2 py-1 text-xs font-medium rounded-full ${organize.organizer.approver ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}>
+										{organize.organizer.approver ? 'ได้รับการอนุมัติ' : 'รอการอนุมัติ'}
+									</span>
 								</div>
 							</div>
 							
@@ -265,6 +263,7 @@ export default async function OrganizerDashboardPage() {
 			{/* Footer */}
 			<footer className="max-w-7xl mx-auto mt-12 text-center text-gray-600 dark:text-gray-400 text-sm">
 				<p>© {new Date().getFullYear()} EventPress. สงวนลิขสิทธิ์.</p>
+				<p className="mt-2">ติดต่อผู้ดูแลระบบ: <a href="mailto:ratnaritjumnong@gmail.com" className="hover:text-blue-500 dark:hover:text-blue-400 underline">ratnaritjumnong@gmail.com</a></p>
 			</footer>
 		</div>
 	);

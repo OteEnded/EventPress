@@ -36,13 +36,15 @@ export async function POST(req) {
         
         const requiredFields = ["identity_email"];
         
-        const user = await User.getUserByIdentityEmail(request_body.identity_email);
+        let user = await User.getUserByIdentityEmail(request_body.identity_email);
         if (!user) {
             return NextResponse.json(
                 { message: "User not found", isSuccess: false },
                 { status: 404 }
             );
         }
+        
+        user = await user.expand();
 
         return NextResponse.json(
             { message: "User retrieved successfully", content: user, isSuccess: true },

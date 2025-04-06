@@ -6,11 +6,19 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import DeleteOrganizerModal from "@/ui/modals/DeleteOrganizerModal";
+import ApproveOrganizerModal from "@/ui/modals/ApproveOrganizerModal";
 
 export default function OrganizerDetailPage() {
     const { organizerId } = useParams();
     const router = useRouter();
     const { data: session } = useSession();
+
+    // State for user data and admin check
+    const [userData, setUserData] = useState(null);
+    const [isSystemAdmin, setIsSystemAdmin] = useState(false);
+    
+    // State for approval confirmation modal
+    const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
 
     // State for organizer data
     const [name, setName] = useState("");
@@ -154,6 +162,44 @@ export default function OrganizerDetailPage() {
         }
     }, [organizerId]);
 
+    // Fetch user data to check if SystemAdmin
+    useEffect(() => {
+        const fetchUserData = async () => {
+            if (userData) {
+                return;
+            }
+
+            if (!session?.user?.email) {
+                console.log("No session or email found");
+                return;
+            }
+
+            try {
+                const response = await fetch("/api/data/user/get/identity_email", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ identity_email: session.user.email }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch user data: ${response.status}`);
+                }
+
+                const data = await response.json();
+                setUserData(data.content);
+                
+                // Check if user is SystemAdmin
+                setIsSystemAdmin(data.content.SystemAdmin !== null);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+
+        fetchUserData();
+    }, [session, userData]);
+
     // Function to handle file selection for logo
     const handleLogoChange = (e) => {
         const file = e.target.files[0];
@@ -254,6 +300,33 @@ export default function OrganizerDetailPage() {
         }
     };
 
+    // Function to handle approval of organizer
+    const handleApproveOrganizer = async () => {
+        try {
+            const response = await fetch(`/api/data/organizer/approve/${organizerId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to approve organizer");
+            }
+
+            const result = await response.json();
+
+            if (!result.isSuccess) {
+                throw new Error(result.message || "Failed to approve organizer");
+            }
+
+            setApprover(result.content.approver);
+        } catch (error) {
+            console.error("Error approving organizer:", error);
+            setError("เกิดข้อผิดพลาดในการอนุมัติองค์กร");
+        }
+    };
+
     // Check for form changes
     useEffect(() => {
         const valuesChanged =
@@ -322,24 +395,27 @@ export default function OrganizerDetailPage() {
                     </button>
                 </div>
 
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-                    <div className="flex items-center gap-4">
-                        <h1 className="text-4xl lg:text-5xl font-extrabold mb-4 md:mb-0">
-                            ข้อมูลองค์กร
-                        </h1>
-                        
-                        {/* Approval Status Badge */}
-                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${approver ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}>
-                            {approver ? 'ได้รับการอนุมัติแล้ว' : 'รอการอนุมัติ'}
-                        </div>
+                <div className="flex items-center gap-4">
+                    <h1 className="text-4xl lg:text-5xl font-extrabold mb-4 md:mb-0">
+                        ข้อมูลองค์กร
+                    </h1>
+                    
+                    {/* Approval Status Badge */}
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${approver ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}>
+                        {approver ? 'ได้รับการอนุมัติแล้ว' : 'รอการอนุมัติ'}
                     </div>
                     
-                    {isOwner && (
-                        <div className="flex items-center gap-2">
-                            <span className={`text-sm ${saveStatus.status}`}>
-                                {saveStatus.message}
-                            </span>
-                        </div>
+                    {/* Approval Button for SystemAdmin */}
+                    {isSystemAdmin && !approver && (
+                        <button
+                            onClick={() => setIsApprovalModalOpen(true)} 
+                            className="ml-2 px-3 py-1 bg-green-600 text-white rounded-full text-sm font-medium hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400 transition flex items-center gap-1"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                            อนุมัติองค์กร
+                        </button>
                     )}
                 </div>
 
@@ -547,10 +623,10 @@ export default function OrganizerDetailPage() {
                     {approver && (
                         <div>
                             <p className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                ผู้อนุมัติองค์กร
+                                รหัสผู้อนุมัติองค์กร
                             </p>
                             <p className="p-3 block w-full bg-gray-100 dark:bg-gray-700 rounded-md dark:text-white">
-                                {approver.firstname} {approver.lastname} ({approver.display_name || approver.indentity_email})
+                                {approver}
                             </p>
                         </div>
                     )}
@@ -661,6 +737,15 @@ export default function OrganizerDetailPage() {
             <DeleteOrganizerModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
+                organizerId={organizerId}
+                organizerName={name}
+            />
+
+            {/* Approve Organizer Modal */}
+            <ApproveOrganizerModal
+                isOpen={isApprovalModalOpen}
+                onClose={() => setIsApprovalModalOpen(false)}
+                onApprove={handleApproveOrganizer}
                 organizerId={organizerId}
                 organizerName={name}
             />

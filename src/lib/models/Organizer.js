@@ -91,8 +91,37 @@ async function getOrganizersByOwnerUserId(ownerUserId) {
     return results;
 }
 
+async function approveOrganizer(organizerId, approverUserId) {
+    try {
+        
+        const dbConnection = getConnection();
+        
+        // First check if organizer exists
+        const existingOrganizer = await getOrganizerByOrganizerId(organizerId);
+        if (!existingOrganizer) {
+            throw new Error("Organizer not found");
+        }
+
+        if (!existingOrganizer) {
+            throw new Error("Organizer not found");
+        }
+
+        // Update organizer with approver
+        const updatedOrganizer = await dbConnection.update(organizers).set({
+            approver: approverUserId,
+        }).where(eq(organizers.organizer_id, organizerId)).returning();
+        
+        return updatedOrganizer;
+        
+    } catch (error) {
+        console.error("Error approving organizer:", error);
+        return null;
+    }
+}
+
 export default {
     getOrganizerByOrganizerId,
     getOrganizersByOwner,
     getOrganizersByOwnerUserId,
+    approveOrganizer,
 };

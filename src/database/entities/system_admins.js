@@ -9,9 +9,8 @@ import { users } from "./users.js";
 
 // 'cascade' | 'restrict' | 'no action' | 'set null' | 'set default';
 export const systemAdmins = pgTable("system_admins", {
-    // Primary Key
-    system_admin_id: uuid().defaultRandom().primaryKey(),
-    user: uuid().references(() => users.user_id, { onDelete: 'cascade' }),
+
+    user: uuid().primaryKey().references(() => users.user_id, { onDelete: 'cascade' }),
     note: text(),
     
     created_at: timestamp().defaultNow(),
