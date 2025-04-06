@@ -24,6 +24,10 @@ export default async function OrganizerDashboardPage() {
 
 	const user = await User.getUserByIdentityEmail(session.user.email);
 	const event_of_user = await Event.getEventsOfUser(user.user_id);
+	
+	// Check if user is system admin
+	const isSystemAdmin = user.SystemAdmin !== null;
+	console.log("isSystemAdmin", isSystemAdmin);
 
 	function get_events(organize) {
 		let result = [];
@@ -187,7 +191,7 @@ export default async function OrganizerDashboardPage() {
 							แดชบอร์ด
 						</h1>
 						<p className="text-gray-600 dark:text-gray-300 mt-2">
-							จัดการองค์กรและอีเวนต์ของคุณได้ที่นี่
+							องค์กรทั้งหมด
 						</p>
 					</div>
 					
@@ -249,7 +253,9 @@ export default async function OrganizerDashboardPage() {
 				{/* Organizations & Events */}
 				<section className="mb-8">
 					<div className="bg-white dark:bg-gray-800 p-6 rounded-t-xl shadow-md border-b border-gray-200 dark:border-gray-700">
-						<h2 className="text-2xl font-bold text-gray-800 dark:text-white">องค์กรและอีเวนต์ของฉัน</h2>
+						<h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+							{isSystemAdmin ? 'องค์กรและอีเวนต์ทั้งหมด' : 'จัดการองค์กรและอีเวนต์ของคุณได้ที่นี่'}
+						</h2>
 					</div>
 					
 					<div className="bg-white/50 dark:bg-gray-800/50 rounded-b-xl p-6">
