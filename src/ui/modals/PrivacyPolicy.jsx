@@ -1,18 +1,62 @@
 export default function PrivacyPolicy() {
     return (
       <div className="max-h-60 overflow-y-auto text-gray-600 dark:text-gray-300">
-        <p>
-          EventPress values your privacy. We collect personal information only
-          for account management and event organization.
+        <h3 className="font-bold text-gray-800 dark:text-white mb-3">นโยบายความเป็นส่วนตัว EventPress</h3>
+        
+        <p className="mb-2">
+          EventPress ให้ความสำคัญกับความเป็นส่วนตัวของคุณ นโยบายนี้อธิบายวิธีการที่เราเก็บรวบรวม ใช้ และเปิดเผยข้อมูลส่วนบุคคลของคุณ
+          เมื่อคุณใช้แพลตฟอร์มจัดการอีเวนต์ของเรา
         </p>
-        <p className="mt-2">
-          1. We do not sell your data to third parties.
+
+        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-3 mb-1">1. ข้อมูลที่เราเก็บรวบรวม</h4>
+        <p className="mb-2">
+          <span className="font-medium">ข้อมูลส่วนบุคคล:</span> ชื่อ-นามสกุล, อีเมล, เบอร์โทรศัพท์, อายุ และชื่อที่ใช้แสดง<br />
+          <span className="font-medium">ข้อมูลกิจกรรม:</span> ข้อมูลเกี่ยวกับอีเวนต์ บูธ และกิจกรรมที่คุณสร้างหรือเข้าร่วม<br />
+          <span className="font-medium">ข้อมูลการใช้งาน:</span> ข้อมูลเกี่ยวกับวิธีการที่คุณใช้แพลตฟอร์ม รวมถึงเวลาและความถี่ในการใช้งาน
         </p>
-        <p className="mt-2">
-          2. Data is stored securely and encrypted where applicable.
+
+        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-3 mb-1">2. วิธีการใช้ข้อมูล</h4>
+        <p className="mb-2">
+          เราใช้ข้อมูลของคุณเพื่อวัตถุประสงค์ดังต่อไปนี้:<br />
+          • เพื่อให้บริการจัดการอีเวนต์และรองรับการทำงานของบูธและกิจกรรมต่างๆ<br />
+          • เพื่อการยืนยันตัวตนและการรักษาความปลอดภัยของบัญชี<br />
+          • เพื่อปรับปรุงและพัฒนาแพลตฟอร์มให้ดียิ่งขึ้น<br />
+          • เพื่อติดต่อสื่อสารกับคุณเกี่ยวกับอีเวนต์และบริการของเรา
         </p>
-        <p className="mt-2">... (More legal stuff) ...</p>
+
+        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-3 mb-1">3. การแบ่งปันข้อมูล</h4>
+        <p className="mb-2">
+          <span className="font-medium">เราไม่ขายข้อมูลส่วนบุคคลของคุณให้กับบุคคลที่สาม</span><br />
+          อย่างไรก็ตาม เราอาจแบ่งปันข้อมูลในกรณีต่อไปนี้:<br />
+          • กับผู้เข้าร่วมอีเวนต์ สำหรับข้อมูลที่จำเป็นในการจัดการอีเวนต์<br />
+          • กับผู้ให้บริการที่เราใช้เพื่อสนับสนุนแพลตฟอร์มของเรา<br />
+          • เมื่อมีการร้องขอตามกฎหมาย
+        </p>
+
+        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-3 mb-1">4. การรักษาความปลอดภัยข้อมูล</h4>
+        <p className="mb-2">
+          เราใช้มาตรการรักษาความปลอดภัยทางเทคนิคและการจัดการที่เหมาะสม เพื่อปกป้องข้อมูลของคุณจากการเข้าถึง การใช้ 
+          หรือการเปิดเผยโดยไม่ได้รับอนุญาต ข้อมูลที่สำคัญ เช่น รหัสผ่าน จะถูกเข้ารหัสเพื่อความปลอดภัยสูงสุด
+        </p>
+
+        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-3 mb-1">5. สิทธิของคุณ</h4>
+        <p className="mb-2">
+          คุณมีสิทธิ์ในการ:<br />
+          • เข้าถึงข้อมูลส่วนบุคคลของคุณ<br />
+          • แก้ไขข้อมูลที่ไม่ถูกต้อง<br />
+          • ลบข้อมูลของคุณ (ภายใต้เงื่อนไขบางประการ)<br />
+          • คัดค้านหรือจำกัดการประมวลผลข้อมูลของคุณ
+        </p>
+
+        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-3 mb-1">6. การเปลี่ยนแปลงนโยบาย</h4>
+        <p className="mb-2">
+          EventPress อาจปรับปรุงนโยบายความเป็นส่วนตัวเป็นครั้งคราว โดยจะแจ้งให้คุณทราบผ่านทางเว็บไซต์หรืออีเมล 
+          การใช้บริการหลังการเปลี่ยนแปลงถือเป็นการยอมรับนโยบายที่แก้ไขแล้ว
+        </p>
+
+        <p className="mt-4">
+          หากมีข้อสงสัยเกี่ยวกับนโยบายความเป็นส่วนตัวของเรา โปรดติดต่อเราได้ที่ ratnarit.j@ku.th
+        </p>
       </div>
     );
   }
-  

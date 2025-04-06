@@ -263,7 +263,7 @@ export default async function OrganizerDashboardPage() {
 			{/* Footer */}
 			<footer className="max-w-7xl mx-auto mt-12 text-center text-gray-200 dark:text-gray-400 text-sm">
 				<p>© {new Date().getFullYear()} EventPress. สงวนลิขสิทธิ์.</p>
-				<p className="mt-2">ติดต่อผู้ดูแลระบบ: <a href="mailto:ratnaritjumnong@gmail.com" className="font-medium text-gray-300 hover:text-blue-200 dark:text-gray-400 dark:hover:text-blue-400 underline">ratnaritjumnong@gmail.com</a></p>
+				<p className="mt-2">ติดต่อผู้ดูแลระบบ: <a href="mailto:ratnaritjumnong@gmail.com" className="font-medium text-gray-300 hover:text-blue-200 dark:text-gray-400 dark:hover:text-blue-400 underline">ratnarit.j@ku.th</a></p>
 			</footer>
 		</div>
 	);

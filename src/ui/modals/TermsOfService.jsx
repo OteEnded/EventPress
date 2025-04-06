@@ -1,18 +1,51 @@
 export default function TermsOfService() {
     return (
       <div className="max-h-60 overflow-y-auto text-gray-600 dark:text-gray-300">
-        <p>
-          Welcome to EventPress. These Terms of Service govern your use of our
-          platform. By registering, you agree to comply with these terms.
+        <h3 className="font-bold text-gray-800 dark:text-white mb-3">ข้อตกลงการใช้งาน EventPress</h3>
+        
+        <p className="mb-2">
+          ยินดีต้อนรับสู่ EventPress แพลตฟอร์มสำหรับการจัดการอีเวนต์ การลงทะเบียนและใช้งานบริการของเรา 
+          ถือว่าคุณได้ยอมรับข้อกำหนดและเงื่อนไขทั้งหมดที่ระบุไว้ในข้อตกลงนี้
         </p>
-        <p className="mt-2">
-          1. You must be at least 18 years old to use this service.
+
+        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-3 mb-1">1. การใช้บริการ</h4>
+        <p className="mb-2">
+          1.1 ผู้ใช้จะต้องมีวุฒิภาวะ หรือได้รับความยินยอมจากผู้ปกครองในการใช้บริการ<br />
+          1.2 ผู้ใช้จะต้องใช้ข้อมูลที่ถูกต้องและเป็นความจริงในการลงทะเบียน<br />
+          1.3 ผู้ใช้ต้องรับผิดชอบในการรักษาความปลอดภัยของบัญชีและรหัสผ่านของตนเอง<br />
+          1.4 EventPress ขอสงวนสิทธิ์ในการระงับหรือยกเลิกบัญชีที่ละเมิดข้อตกลงโดยไม่ต้องแจ้งให้ทราบล่วงหน้า
         </p>
-        <p className="mt-2">
-          2. You agree not to misuse the platform for any illegal activities.
+
+        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-3 mb-1">2. การจัดการอีเวนต์</h4>
+        <p className="mb-2">
+          2.1 ผู้จัดอีเวนต์มีหน้าที่รับผิดชอบต่อข้อมูลและเนื้อหาที่เผยแพร่บนแพลตฟอร์ม<br />
+          2.2 ห้ามจัดอีเวนต์ที่ผิดกฎหมาย ละเมิดลิขสิทธิ์ หรือมีเนื้อหาที่ไม่เหมาะสม<br />
+          2.3 ผู้จัดอีเวนต์ต้องปฏิบัติตามกฎหมายที่เกี่ยวข้องกับการจัดงาน รวมถึงการเก็บภาษีและใบอนุญาตต่างๆ<br />
+          2.4 EventPress ไม่รับผิดชอบต่อความเสียหายใดๆ ที่เกิดจากการจัดอีเวนต์ของผู้ใช้
         </p>
-        <p className="mt-2">... (More legal stuff) ...</p>
+
+        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-3 mb-1">3. บูธและกิจกรรม</h4>
+        <p className="mb-2">
+          3.1 ผู้จัดอีเวนต์มีสิทธิ์ในการจัดการบูธและกิจกรรมภายในอีเวนต์ของตน<br />
+          3.2 ข้อมูลบูธและกิจกรรมต้องเป็นข้อมูลที่ถูกต้องและไม่ละเมิดสิทธิ์ของบุคคลอื่น<br />
+          3.3 EventPress ขอสงวนสิทธิ์ในการลบบูธหรือกิจกรรมที่ละเมิดข้อตกลงโดยไม่ต้องแจ้งให้ทราบล่วงหน้า
+        </p>
+
+        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-3 mb-1">4. การเปลี่ยนแปลงข้อตกลง</h4>
+        <p className="mb-2">
+          EventPress ขอสงวนสิทธิ์ในการเปลี่ยนแปลงข้อตกลงนี้ได้ทุกเมื่อ การเปลี่ยนแปลงจะมีผลทันทีเมื่อประกาศบนเว็บไซต์ 
+          การใช้บริการหลังจากการเปลี่ยนแปลงถือว่าคุณยอมรับข้อตกลงใหม่แล้ว
+        </p>
+
+        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-3 mb-1">5. การยกเลิกการให้บริการ</h4>
+        <p className="mb-2">
+          EventPress มีสิทธิ์ที่จะยกเลิกหรือระงับการให้บริการกับผู้ใช้รายใดก็ตามที่ละเมิดข้อตกลงนี้ 
+          หรือกระทำการที่อาจก่อให้เกิดความเสียหายแก่แพลตฟอร์มหรือผู้ใช้รายอื่น
+        </p>
+
+        <p className="mt-4">
+          การใช้บริการ EventPress ถือเป็นการยอมรับข้อตกลงทั้งหมดที่ระบุไว้ข้างต้น
+        </p>
       </div>
     );
   }
-  

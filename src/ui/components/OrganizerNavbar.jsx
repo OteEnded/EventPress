@@ -70,6 +70,9 @@ export default function OrganizerNavbar() {
         return `${profile.firstname} ${profile.lastname}`;
     };
 
+    // Check if user is a system admin
+    const isSystemAdmin = userData?.SystemAdmin !== null;
+
     return (
         <div className="px-4 py-2 flex justify-between items-center bg-gray-100 dark:bg-gray-800">
             {/* Logo and Theme Toggle */}
@@ -96,6 +99,11 @@ export default function OrganizerNavbar() {
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                             {userData?.identity_email || session.user.email}
                         </p>
+                        {isSystemAdmin && (
+                            <p className="text-xs text-red-500 dark:text-red-400 font-medium">
+                                หมายเลขผู้ดูแลระบบ: {userData?.user_id}
+                            </p>
+                        )}
                     </div>
                 )}
                 {!session ? (
