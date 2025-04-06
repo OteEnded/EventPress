@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
     const [isTermsOpen, setIsTermsOpen] = useState(false);
@@ -16,10 +16,13 @@ export default function LoginForm() {
     const [success, setSuccess] = useState("");
     
     const { data: session } = useSession();
+    const router = useRouter();
 
-    if (session) {
-        redirect("/organizer");
-    }
+    useEffect(() => {
+        if (session) {
+            router.push("/organizer");
+        }
+    }, [session, router]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -36,8 +39,7 @@ export default function LoginForm() {
                 return;
             } 
             
-            redirect("/organizer");
-
+            router.push("/organizer");
         } catch (error) {
             setError("An error occurred. Please try again later.");
         }

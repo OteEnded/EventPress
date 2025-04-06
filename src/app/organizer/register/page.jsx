@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Modal from "@/ui/modals/InformationModal";
 import TermsOfService from "@/ui/modals/TermsOfService";
 import PrivacyPolicy from "@/ui/modals/PrivacyPolicy";
-import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useSession, signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 // Add custom CSS to hide number input spinners
 const hideNumberInputSpinners = {
@@ -32,12 +32,17 @@ export default function OrganizerRegisterPage() {
     const [agreement, setAgreement] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const router = useRouter();
     const { data: session } = useSession();
 
-    if (session) {
-        redirect("/organizer");
-    }
+    // Handle session redirect in useEffect instead of at the component level
+    useEffect(() => {
+        if (session) {
+            router.push("/organizer");
+        }
+    }, [session, router]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -57,8 +62,12 @@ export default function OrganizerRegisterPage() {
             return;
         }
 
+        setIsSubmitting(true);
+        setError("");
+
         try {
-            const response = await fetch("/api/auth/register", {
+            // 1. Register the user
+            const registerResponse = await fetch("/api/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -74,20 +83,42 @@ export default function OrganizerRegisterPage() {
                 }),
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data);
-                const form = e.target;
-                form.reset();
-                setError(null);
-                setSuccess("Registration successful.");
-            } else {
-                const data = await response.json();
-                setError(data.message);
+            if (!registerResponse.ok) {
+                const data = await registerResponse.json();
+                throw new Error(data.message || "Registration failed");
             }
+
+            const registerData = await registerResponse.json();
+            setSuccess("Registration successful. Logging you in...");
+            
+            // Add a delay before auto-login to give the user time to see the message
+            setTimeout(async () => {
+                // 2. Auto-login the user after successful registration
+                const loginResponse = await signIn("credentials", {
+                    redirect: false,
+                    indentity_email: indentityEmail,
+                    password: password
+                });
+                
+                if (loginResponse.error) {
+                    // If login fails, show success message but with a link to login page
+                    setSuccess("Registration successful! Please login with your credentials.");
+                    
+                    // Reset the form
+                    e.target.reset();
+                    setPassword("");
+                    setPasswordConfirm("");
+                } else {
+                    // If login succeeds, redirect to organizer page
+                    router.push("/organizer");
+                }
+            }, 2000); // 2 seconds delay
+            
         } catch (error) {
-            console.log("An error occurred while registering.", error);
-            setError("An error occurred while registering.");
+            console.log("An error occurred:", error);
+            setError(error.message || "An error occurred while registering.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -331,9 +362,20 @@ export default function OrganizerRegisterPage() {
                         <div className="mb-4">
                             <button
                                 type="submit"
-                                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-base font-semibold transition-colors duration-200 shadow-sm"
+                                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-base font-semibold transition-colors duration-200 shadow-sm flex justify-center items-center"
+                                disabled={isSubmitting}
                             >
-                                ลงทะเบียน
+                                {isSubmitting ? (
+                                    <>
+                                        <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        กำลังลงทะเบียน...
+                                    </>
+                                ) : (
+                                    "ลงทะเบียน"
+                                )}
                             </button>
                         </div>
 
