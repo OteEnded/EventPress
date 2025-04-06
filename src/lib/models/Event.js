@@ -1,6 +1,6 @@
 import projectutility from "@/lib/projectutility";
 import { getConnection } from "@/lib/dbconnector";
-import { users, organizers, events } from "@/database/schema";
+import { users, organizers, events, booths } from "@/database/schema";
 import { eq, or } from "drizzle-orm";
 import Organizer from "./Organizer";
 
@@ -21,6 +21,15 @@ async function getEventByEventId(eventId) {
     if (eventQueryResult.length === 0) {
         return null;
     }
+    
+    // select booths of the event
+    const boothsQueryResult = await dbConnection
+        .select()
+        .from(booths)
+        .where(eq(booths.event, eventId));
+    eventQueryResult[0].Booths = boothsQueryResult;
+
+    
     return eventQueryResult[0];
 }
 
@@ -223,7 +232,14 @@ async function getEventByIdName(idName) {
     if (eventQueryResult.length === 0) {
         return null;
     }
-    return eventQueryResult[0];
+    
+    const eventFromID = await getEventByEventId(eventQueryResult[0].event_id);
+    if (eventFromID) {
+        return eventFromID;
+    }
+    
+    throw new Error("Event not found.");
+    return null
 }
 
 export default {

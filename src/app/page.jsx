@@ -6,6 +6,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/next-auth-options";
 import { redirect } from "next/navigation";
 
+import { AuthProvider } from "@/ui/providers/AuthProvider";
+
 export const metadata = {
 	title: "EventPress - Simplify Event Management",
 	description: "Easily create and manage event pages with EventPress.",
@@ -23,7 +25,10 @@ export default async function HomePage() {
 	return (
 		<>
 			{/* navbar */}
-			<OrganizerNavbar />
+			
+			<AuthProvider>
+				<OrganizerNavbar />
+			</AuthProvider>
 
 			{/* <LandingPage /> */}
 			<div className="min-h-screen flex flex-col items-center justify-center bg-[#5E9BD6] text-gray-700 dark:bg-gray-900 dark:text-gray-100 px-6">

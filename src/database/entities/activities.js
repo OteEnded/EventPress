@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, timestamp  } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, timestamp, time, real  } from "drizzle-orm/pg-core";
 import { booths } from "./booths.js";
 // import { webPages } from "./web_pages.js";
 
@@ -19,6 +19,9 @@ export const activities = pgTable("activities", {
     name: text().notNull(),
     description: text(),
     location: text(),
+    start_time: time(),
+    end_time: time(),
+    price: real().default(0.0),
     
     created_at: timestamp().defaultNow(),
     updated_at: timestamp().defaultNow().$onUpdate(() => new Date()).notNull()

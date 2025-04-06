@@ -7,7 +7,7 @@ import Modal from "@/ui/modals/InformationModal";
 import TermsOfService from "@/ui/modals/TermsOfService";
 import PrivacyPolicy from "@/ui/modals/PrivacyPolicy";
 import { useSession } from "next-auth/react";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function OrganizerCreatePage() {
     
@@ -26,46 +26,77 @@ export default function OrganizerCreatePage() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const router = useRouter();
 
-    if (!session) {
-        redirect("/organizer/login");
-    }
+    // Handle authentication with notification
+    const [redirecting, setRedirecting] = useState(false);
+    
+    // Move all useEffect hooks before any conditional returns
+    useEffect(() => {
+        if (status === "unauthenticated" && !redirecting) {
+            setRedirecting(true);
+            // Show message for 2 seconds before redirecting
+            setTimeout(() => {
+                router.push("/organizer/login");
+            }, 2000);
+        }
+    }, [status, router, redirecting]);
     
     useEffect(() => {
-            const fetchUserData = async () => {
-                if (userData) {
-                    return;
+        const fetchUserData = async () => {
+            if (userData) {
+                return;
+            }
+
+            if (!session?.user?.email) {
+                console.log("No session or email found");
+                return;
+            }
+
+            try {
+                const response = await fetch("/api/data/user/get/identity_email", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ identity_email: session.user.email }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch user data: ${response.status}`);
                 }
-    
-                if (!session?.user?.email) {
-                    console.log("No session or email found");
-                    return;
-                }
-    
-                try {
-                    const response = await fetch("/api/data/user/get/identity_email", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ identity_email: session.user.email }),
-                    });
-    
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch user data: ${response.status}`);
-                    }
-    
-                    const data = await response.json();
-                    setUserData(data.content);
-                } catch (error) {
-                    console.error("Error fetching user data:", error);
-                }
-            };
-    
-            fetchUserData();
-        }, [session, userData]);
+
+                const data = await response.json();
+                setUserData(data.content);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+
+        fetchUserData();
+    }, [session, userData]);
+
+    // Show redirection message if not authenticated
+    if (status === "unauthenticated") {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#5E9BD6] dark:bg-gray-900 text-white p-12">
+                <div className="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md">
+                    <div className="text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-blue-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <h2 className="text-2xl font-bold text-gray-700 dark:text-white mb-2">กรุณาเข้าสู่ระบบ</h2>
+                        <p className="text-gray-600 dark:text-gray-300 mb-4">คุณต้องเข้าสู่ระบบก่อนสร้างองค์กร</p>
+                        <div className="flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500 mr-3"></div>
+                            <p className="text-gray-600 dark:text-gray-300">กำลังนำคุณไปยังหน้าเข้าสู่ระบบ...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -195,7 +226,7 @@ export default function OrganizerCreatePage() {
 
                     <div className="mb-4">
                         <label htmlFor="organization_phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            หมายเลขโทรศัพท์องค์กร
+                            เบอร์โทรติดต่อองค์กร
                         </label>
                         <input
                             type="text"

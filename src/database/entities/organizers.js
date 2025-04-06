@@ -8,7 +8,6 @@ export const organizers = pgTable("organizers", {
     owner: uuid().notNull().references(() => users.user_id, { onDelete: "cascade" }),
     
     name: text().notNull(),
-    // business_name: text(),
     description: text(),
     logo: uuid().references(() => files.file_id, { onDelete: "set null" }),
     website: text(),

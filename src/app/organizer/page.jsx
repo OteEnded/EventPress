@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth/next-auth-options";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import RefreshButton from "@/ui/components/RefreshButton";
 
 // This function sets cache control headers to prevent caching
 export const dynamic = 'force-dynamic';
@@ -157,13 +158,20 @@ export default async function OrganizerDashboardPage() {
 			return (
 				<div className="bg-white dark:bg-gray-800 rounded-lg p-8 text-center shadow-md">
 					<div className="text-5xl mb-4">🏢</div>
-					<h3 className="text-xl font-medium mb-2 text-gray-800 dark:text-white">คุณยังไม่มีองค์กร</h3>
-					<p className="text-gray-600 dark:text-gray-400 mb-6">ลงทะเบียนองค์กรของคุณเพื่อเริ่มต้นการสร้างและจัดการอีเวนต์</p>
-					<Link href="/organizer/create">
-						<button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
-							+ ลงทะเบียนองค์กร
-						</button>
-					</Link>
+					<h3 className="text-xl font-medium mb-2 text-gray-800 dark:text-white">คุณยังไม่มีองค์กรที่เกี่ยวข้อง</h3>
+					<p className="text-gray-600 dark:text-gray-400 mb-6">ลงทะเบียนองค์กรของคุณหรือใช้คำเชิญสตาฟเพื่อเข้าถึงองค์กรที่คุณได้รับเชิญ</p>
+					<div className="flex flex-col sm:flex-row justify-center gap-4">
+						<Link href="/organizer/create">
+							<button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition w-full">
+								+ ลงทะเบียนองค์กร
+							</button>
+						</Link>
+						<Link href="/organizer/staffinvitation">
+							<button className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400 transition w-full">
+								รับคำเชิญสตาฟ
+							</button>
+						</Link>
+					</div>
 				</div>
 			);
 		}
@@ -185,7 +193,9 @@ export default async function OrganizerDashboardPage() {
 						</p>
 					</div>
 					
-					<div className="flex flex-wrap gap-3">
+					<div className="flex flex-wrap gap-3 items-center">
+						<RefreshButton />
+						
 						<Link href="/organizer/create">
 							<button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition flex items-center">
 								<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
@@ -195,12 +205,12 @@ export default async function OrganizerDashboardPage() {
 							</button>
 						</Link>
 						
-						<Link href="/">
+						<Link href="/organizer/staffinvitation">
 							<button className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg font-medium transition flex items-center">
 								<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
 									<path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
 								</svg>
-								เชิญสตาฟ
+								รับคำเชิญสตาฟ
 							</button>
 						</Link>
 					</div>

@@ -16,12 +16,12 @@ export async function POST(req) {
         
         console.log("Session:", session);
     
-        if (!session) {
-            return NextResponse.json(
-                { message: "Unauthorized access", isSuccess: false },
-                { status: 401 }
-            );
-        }
+        // if (!session) {
+        //     return NextResponse.json(
+        //         { message: "Unauthorized access", isSuccess: false },
+        //         { status: 401 }
+        //     );
+        // }
         
         let request_body;
         try {

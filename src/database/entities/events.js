@@ -1,6 +1,7 @@
 import { pgTable, text, uuid, time, date, timestamp, real, uniqueIndex  } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { organizers } from "./organizers.js";
+import { files } from "./files.js";
 import { Table } from "drizzle-orm";
 // import { webPages } from "./web_pages.js";
 
@@ -20,6 +21,7 @@ export const events = pgTable("events", {
     capacity: text(),
     price: real().default(0.0),
     contact_info: text(),
+    banner: uuid().references(() => files.file_id, { onDelete: "set null" }),
     // web_page: uuid("web_page").references(() => webPages.web_page_id, { onDelete: "set null" }),
     
     created_at: timestamp().defaultNow(),

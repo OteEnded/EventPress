@@ -1,4 +1,5 @@
 import OrganizerNavbar from "@/ui/components/OrganizerNavbar";
+import { AuthProvider } from "@/ui/providers/AuthProvider";
 
 import User from "@/lib/models/User";
 
@@ -8,12 +9,13 @@ import User from "@/lib/models/User";
 // };
 
 export default async function OrganizerLayout({ children }) {
-    
     return (
         <>
-            {/* navbar */}
-            <OrganizerNavbar />
-            {children}
+            <AuthProvider>
+                {/* navbar */}
+                <OrganizerNavbar />
+                {children}
+            </AuthProvider>
         </>
     );
 }

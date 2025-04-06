@@ -8,7 +8,8 @@ import { users } from "./users.js";
 */
 
 // 'cascade' | 'restrict' | 'no action' | 'set null' | 'set default';
-export const userProfiles = pgTable("user_profiles", {
+export const systemAdmins = pgTable("system_admins", {
+    // Primary Key
     system_admin_id: uuid().defaultRandom().primaryKey(),
     user: uuid().references(() => users.user_id, { onDelete: 'cascade' }),
     note: text(),

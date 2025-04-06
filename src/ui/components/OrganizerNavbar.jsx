@@ -7,10 +7,16 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import eventPressLogo from "@public/eventpress-logo.png";
 import { signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 export default function OrganizerNavbar() {
     const [userData, setUserData] = useState(null);
     const { data: session } = useSession();
+    const pathname = usePathname();
+    
+    // Check current page to determine which button to show
+    const isLoginPage = pathname === "/organizer/login";
+    const isRegisterPage = pathname === "/organizer/register";
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -48,7 +54,9 @@ export default function OrganizerNavbar() {
 
     // Determine the username to display
     const getDisplayName = () => {
-        if (!userData) return "Loading...";
+        if (!session) return null; // Return null when no session exists
+        if (!userData) return "Loading..."; // Only show loading if session exists but userData doesn't
+        
         const profile = userData.UserProfile;
 
         if (!profile) {
@@ -66,49 +74,71 @@ export default function OrganizerNavbar() {
         <div className="px-4 py-2 flex justify-between items-center bg-gray-100 dark:bg-gray-800">
             {/* Logo and Theme Toggle */}
             <div className="flex items-center gap-4">
-                <Image
-                    src={eventPressLogo}
-                    alt="Event Press logo"
-                    width={40}
-                    height={40}
-                />
+                <Link href="/">
+                    <Image
+                        src={eventPressLogo}
+                        alt="Event Press logo"
+                        width={40}
+                        height={40}
+                        className="cursor-pointer"
+                    />
+                </Link>
                 <ThemeToggle />
             </div>
 
             {/* Login/Logout Buttons and User Info */}
             <div className="flex items-center gap-4">
-                {userData && (
+                {session && (
                     <div className="text-right">
                         <p className="text-lg font-semibold text-gray-700 dark:text-white">
-                            {getDisplayName()}
+                            {getDisplayName() || "Loading..."}
                         </p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {userData.identity_email}
+                            {userData?.identity_email || session.user.email}
                         </p>
                     </div>
-                )}
-                {!userData && (
-                    <div className="text-gray-500 dark:text-gray-400">Loading...</div>
                 )}
                 {!session ? (
                     <>
                         <Link href="/organizer/staffinvitation">
-                            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
-                                Staff Invitation Login
+                            <button className="px-4 py-2 bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 rounded-lg text-sm font-semibold transition border border-gray-300 dark:border-gray-600">
+                            รับคำเชิญสตาฟ
                             </button>
                         </Link>
-                        <Link href="/organizer/login">
-                            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
-                                Login
-                            </button>
-                        </Link>
+                        
+                        {/* Dynamically show register button on login page */}
+                        {isLoginPage && (
+                            <Link href="/organizer/register">
+                                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
+                                ลงทะเบียน
+                                </button>
+                            </Link>
+                        )}
+                        
+                        {/* Dynamically show login button on register page */}
+                        {isRegisterPage && (
+                            <Link href="/organizer/login">
+                                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
+                                เข้าสู่ระบบ
+                                </button>
+                            </Link>
+                        )}
+                        
+                        {/* Show default login button when not on login/register pages */}
+                        {!isLoginPage && !isRegisterPage && (
+                            <Link href="/organizer/login">
+                                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
+                                เข้าสู่ระบบ
+                                </button>
+                            </Link>
+                        )}
                     </>
                 ) : (
                     <button
                         onClick={() => signOut({ redirect: true })}
                         className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-400 transition"
                     >
-                        Logout
+                        ออกจากระบบ
                     </button>
                 )}
             </div>

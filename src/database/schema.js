@@ -15,7 +15,7 @@ import { organizers } from "./entities/organizers.js";
 import { events } from "./entities/events.js";
 import { booths } from "./entities/booths.js";
 import { activities } from "./entities/activities.js";
-import { activitySlots } from "./entities/activity_slots.js";
+import { systemAdmins } from "./entities/system_admins.js";
 
 export {
     
@@ -39,6 +39,6 @@ export {
     events,
     booths,
     activities,
-    activitySlots,
+    systemAdmins,
     
 };

@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
+import DeleteOrganizerModal from "@/ui/modals/DeleteOrganizerModal";
 
 export default function OrganizerDetailPage() {
     const { organizerId } = useParams();
@@ -21,6 +22,9 @@ export default function OrganizerDetailPage() {
     const [owner, setOwner] = useState("");
     const [ownerData, setOwnerData] = useState(null);
     const [approver, setApprover] = useState(null); // Add state for approver
+
+    // State for delete organizer modal
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     // New state for logo
     const [logo, setLogo] = useState(null);
@@ -475,7 +479,7 @@ export default function OrganizerDetailPage() {
                                 htmlFor="phone_number"
                                 className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2"
                             >
-                                หมายเลขโทรศัพท์
+                                เบอร์โทรติดต่อ
                             </label>
                             <input
                                 type="tel"
@@ -554,6 +558,13 @@ export default function OrganizerDetailPage() {
                     {/* Action buttons for owner */}
                     {isOwner && (
                         <div className="flex justify-end gap-4 pt-4">
+                            <button
+                                type="button"
+                                onClick={() => setIsDeleteModalOpen(true)}
+                                className="px-5 py-3 bg-red-600 text-white rounded-lg text-lg font-semibold hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-400 transition"
+                            >
+                                ลบองค์กร
+                            </button>
                             <button
                                 type="button"
                                 onClick={handleSave}
@@ -645,6 +656,14 @@ export default function OrganizerDetailPage() {
                     </div>
                 )}
             </div>
+
+            {/* Delete Organizer Modal */}
+            <DeleteOrganizerModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                organizerId={organizerId}
+                organizerName={name}
+            />
         </div>
     );
 }

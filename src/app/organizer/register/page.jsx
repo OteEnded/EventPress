@@ -39,15 +39,6 @@ export default function OrganizerRegisterPage() {
         redirect("/organizer");
     }
 
-    const handleAgeChange = (e) => {
-        const value = parseInt(e.target.value);
-        if (isNaN(value) || value < 0) {
-            setAge("0");
-        } else {
-            setAge(e.target.value);
-        }
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -100,214 +91,266 @@ export default function OrganizerRegisterPage() {
         }
     };
 
+    const handleAgeChange = (e) => {
+        const value = e.target.value;
+        if (value >= 0) {
+            setAge(value);
+        }
+    };
+
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-[#5E9BD6] dark:bg-gray-900 text-white px-6">
-            <header className="text-center my-12 ">
-                <h1 className="text-5xl font-extrabold mb-4"> SIGN UP </h1>
-                <p className="text-lg dark:text-gray-300 max-w-2xl">
-                    เข้าร่วม EventPress และเริ่มจัดการอีเวนต์ได้เลย.
-                </p>
-            </header>
+        <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-b from-[#5E9BD6] to-[#4A7CB0] dark:bg-gradient-to-b dark:from-gray-900 dark:to-gray-800 px-4 py-12">
+            <div className="w-full max-w-lg">
+                {/* Header Section */}
+                <header className="text-center mb-8">
+                    <h1 className="text-4xl md:text-5xl font-extrabold mb-3 text-white">
+                        สร้างบัญชีใหม่
+                    </h1>
+                    <p className="text-lg text-white/80 dark:text-gray-300">
+                        เข้าร่วม EventPress และเริ่มจัดการอีเวนต์ได้เลย
+                    </p>
+                </header>
 
-            <section className="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md">
-                <form onSubmit={handleSubmit}>
-                    {error && (
-                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
-                            {error}
+                {/* Form Card */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                    {/* Form Alert Messages */}
+                    {(error || success) && (
+                        <div className={`px-6 py-4 border-b ${error ? 'bg-red-50 border-red-100 dark:bg-red-900/30 dark:border-red-800/30' : 'bg-green-50 border-green-100 dark:bg-green-900/30 dark:border-green-800/30'}`}>
+                            {error && (
+                                <div className="text-red-700 dark:text-red-400 flex items-start">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                    </svg>
+                                    <span>{error}</span>
+                                </div>
+                            )}
+                            {success && (
+                                <div className="text-green-700 dark:text-green-400 flex items-start">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    </svg>
+                                    <span>{success}</span>
+                                </div>
+                            )}
                         </div>
                     )}
 
-                    {success && (
-                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4">
-                            {success}
+                    <form onSubmit={handleSubmit} className="p-6 md:p-8">
+                        {/* Personal Information Section */}
+                        <div className="mb-6">
+                            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                                ข้อมูลส่วนตัว
+                            </h2>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        htmlFor="firstname"
+                                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                    >
+                                        ชื่อจริง <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="firstname"
+                                        name="firstname"
+                                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500"
+                                        required
+                                        onChange={(e) => setFirstname(e.target.value)}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label
+                                        htmlFor="lastname"
+                                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                    >
+                                        นามสกุล <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="lastname"
+                                        name="lastname"
+                                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500"
+                                        required
+                                        onChange={(e) => setLastname(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        htmlFor="display_name"
+                                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                    >
+                                        ชื่อที่ใช้แสดง
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="display_name"
+                                        name="display_name"
+                                        placeholder="ชื่อที่ต้องการให้แสดงในระบบ"
+                                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500"
+                                        onChange={(e) => setDisplayName(e.target.value)}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label
+                                        htmlFor="age"
+                                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                    >
+                                        อายุ
+                                    </label>
+                                    <input
+                                        type="number"
+                                        id="age"
+                                        name="age"
+                                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500"
+                                        onChange={handleAgeChange}
+                                        value={age}
+                                        min="0"
+                                        style={hideNumberInputSpinners}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="mt-4">
+                                <label
+                                    htmlFor="phone_number"
+                                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                >
+                                    เบอร์โทรศัพท์
+                                </label>
+                                <input
+                                    type="tel"
+                                    id="phone_number"
+                                    name="phone_number"
+                                    placeholder="เบอร์โทรศัพท์สำหรับติดต่อ"
+                                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500"
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                />
+                            </div>
                         </div>
-                    )}
 
-                    <div className="mb-4">
-                        <label
-                            htmlFor="firstname"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            ชื่อจริง
-                        </label>
-                        <input
-                            type="text"
-                            id="firstname"
-                            name="firstname"
-                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            required
-                            onChange={(e) => setFirstname(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label
-                            htmlFor="lastname"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            นามสกุล
-                        </label>
-                        <input
-                            type="text"
-                            id="lastname"
-                            name="lastname"
-                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            required
-                            onChange={(e) => setLastname(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label
-                            htmlFor="display_name"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            ชื่อบัญชีผู้ใช้
-                        </label>
-                        <input
-                            type="text"
-                            id="display_name"
-                            name="display_name"
-                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            onChange={(e) => setDisplayName(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label
-                            htmlFor="age"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            อายุ
-                        </label>
-                        <input
-                            type="number"
-                            id="age"
-                            name="age"
-                            className="mt-1 block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            onChange={handleAgeChange}
-                            value={age}
-                            min="0"
-                            style={hideNumberInputSpinners}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label
-                            htmlFor="phone_number"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            หมายเลขโทรศัพท์
-                        </label>
-                        <input
-                            type="text"
-                            id="phone_number"
-                            name="phone_number"
-                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:text-gray-300 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            onChange={(e) => setPhoneNumber(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label
-                            htmlFor="indentity_email"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            อีเมล
-                        </label>
-                        <input
-                            type="email"
-                            id="indentity_email"
-                            name="indentity_email"
-                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:text-gray-300 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            required
-                            onChange={(e) => setIndentityEmail(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label
-                            htmlFor="password"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            รหัสผ่าน
-                        </label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:text-gray-300 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm "
-                            required
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label
-                            htmlFor="password_confirm"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                            ยืนยันรหัสผ่าน
-                        </label>
-                        <input
-                            type="password"
-                            id="password_confirm"
-                            name="password_confirm"
-                            className="mt-1 block w-full px-3 py-2 bg-white text-gray-700 dark:text-gray-300 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            required
-                            onChange={(e) => setPasswordConfirm(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="flex items-center">
-                            <input
-                                type="checkbox"
-                                name="terms"
-                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                required
-                                onChange={(e) => setAgreement(e.target.checked)}
-                            />
-                            <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
-                                ฉันยอมรับ
-                                <button
-                                    type="button"
-                                    onClick={() => setIsTermsOpen(true)}
-                                    className="text-blue-600 dark:text-blue-400 hover:underline mx-1"
+                        {/* Account Information Section */}
+                        <div className="mb-6">
+                            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                                ข้อมูลบัญชี
+                            </h2>
+                            
+                            <div>
+                                <label
+                                    htmlFor="indentity_email"
+                                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                                 >
-                                    นโยบายความเป็นส่วนตัว
-                                </button>
-                                และ
-                                <button
-                                    type="button"
-                                    onClick={() => setIsPrivacyOpen(true)}
-                                    className="text-blue-600 dark:text-blue-400 hover:underline mx-1"
-                                >
-                                    ข้อตกลงการใช้งาน
-                                </button>
-                                ของ EventPress
-                            </span>
-                        </label>
-                    </div>
+                                    อีเมล <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="email"
+                                    id="indentity_email"
+                                    name="indentity_email"
+                                    placeholder="อีเมลสำหรับเข้าสู่ระบบ"
+                                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500"
+                                    required
+                                    onChange={(e) => setIndentityEmail(e.target.value)}
+                                />
+                            </div>
 
-                    <div className="mb-6">
-                        <button
-                            type="submit"
-                            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition"
-                        >
-                            ลงทะเบียน
-                        </button>
-                    </div>
-                </form>
-                <p className="mt-4 text-gray-600 dark:text-gray-300">
-                    มีบัญชีอยู่แล้ว?{" "}
-                    <Link href="/organizer/login">
-                        <span className="text-blue-600 dark:text-blue-400 hover:underline">
-                            เข้าสู่ระบบเลย
-                        </span>
-                    </Link>
-                </p>
-            </section>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <label
+                                        htmlFor="password"
+                                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                    >
+                                        รหัสผ่าน <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500"
+                                        required
+                                        onChange={(e) => setPassword(e.target.value)}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label
+                                        htmlFor="password_confirm"
+                                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                    >
+                                        ยืนยันรหัสผ่าน <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="password"
+                                        id="password_confirm"
+                                        name="password_confirm"
+                                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500"
+                                        required
+                                        onChange={(e) => setPasswordConfirm(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Terms & Agreement */}
+                        <div className="mb-6">
+                            <label className="flex items-start">
+                                <input
+                                    type="checkbox"
+                                    name="terms"
+                                    className="h-5 w-5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    required
+                                    onChange={(e) => setAgreement(e.target.checked)}
+                                />
+                                <span className="ml-2.5 text-sm text-gray-600 dark:text-gray-300">
+                                    ฉันยอมรับ{" "}
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsTermsOpen(true)}
+                                        className="text-blue-600 dark:text-blue-400 hover:underline mx-1 font-medium"
+                                    >
+                                        นโยบายความเป็นส่วนตัว
+                                    </button>
+                                    และ{" "}
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsPrivacyOpen(true)}
+                                        className="text-blue-600 dark:text-blue-400 hover:underline mx-1 font-medium"
+                                    >
+                                        ข้อตกลงการใช้งาน
+                                    </button>
+                                    ของ EventPress
+                                </span>
+                            </label>
+                        </div>
+
+                        {/* Submit Button */}
+                        <div className="mb-4">
+                            <button
+                                type="submit"
+                                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-base font-semibold transition-colors duration-200 shadow-sm"
+                            >
+                                ลงทะเบียน
+                            </button>
+                        </div>
+
+                        {/* Login Link */}
+                        <div className="text-center">
+                            <p className="text-gray-600 dark:text-gray-300">
+                                มีบัญชีอยู่แล้ว?{" "}
+                                <Link href="/organizer/login">
+                                    <span className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer font-medium">
+                                        เข้าสู่ระบบเลย
+                                    </span>
+                                </Link>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
             {/* Modals */}
             <Modal

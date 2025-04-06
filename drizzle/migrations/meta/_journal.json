@@ -99,6 +99,13 @@
       "when": 1743885716319,
       "tag": "0013_null_able_organizer_approver",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1743935992125,
+      "tag": "0014_remove_activity_slot_and_edit_booths",
+      "breakpoints": true
     }
   ]
 }

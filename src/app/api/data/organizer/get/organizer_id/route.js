@@ -10,20 +10,18 @@ import { authOptions } from "@/lib/auth/next-auth-options";
 */
 
 export async function POST(req) {
-    
     try {
-        
         const session = await getServerSession(authOptions);
-        
+
         console.log("Session:", session);
-    
+
         if (!session) {
             return NextResponse.json(
                 { message: "Unauthorized access", isSuccess: false },
                 { status: 401 }
             );
         }
-        
+
         let request_body;
         try {
             request_body = await req.json();
@@ -34,9 +32,9 @@ export async function POST(req) {
                 { status: 400 }
             );
         }
-        
+
         const requiredFields = ["organizer_id"];
-        
+
         for (const field of requiredFields) {
             if (!request_body[field]) {
                 return NextResponse.json(
@@ -45,24 +43,38 @@ export async function POST(req) {
                 );
             }
         }
-        
-        let organizer = await Organizer.getOrganizerByOrganizerId(request_body.organizer_id);
-        if (!organizer) {
+
+        let organizer;
+        try {
+            organizer = await Organizer.getOrganizerByOrganizerId(
+                request_body.organizer_id
+            );
+            if (!organizer) {
+                return NextResponse.json(
+                    { message: "Organizer not found", isSuccess: false },
+                    { status: 404 }
+                );
+            }
+        } catch (error) {
+            console.error("API ERROR: Failed to get organizer", error);
             return NextResponse.json(
                 { message: "Organizer not found", isSuccess: false },
                 { status: 404 }
             );
         }
-        
-        organizer = await organizer.expand()
-        
+
+        organizer = await organizer.expand();
+
         console.log("Organizer data:", organizer);
 
         return NextResponse.json(
-            { message: "Organizer retrieved successfully", content: organizer, isSuccess: true },
+            {
+                message: "Organizer retrieved successfully",
+                content: organizer,
+                isSuccess: true,
+            },
             { status: 200 }
         );
-        
     } catch (error) {
         console.error("API ERROR:", error);
         return NextResponse.json(

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
+import DeleteEventModal from "@/ui/modals/DeleteEventModal";
 
 // Add custom CSS to hide number input spinners
 const hideNumberInputSpinners = {
@@ -63,6 +64,9 @@ export default function OrganizerEventManagePage() {
 
     // State for booths
     const [booths, setBooths] = useState([]); // Initialize empty booth data
+    
+    // State for delete event modal
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     // Modified handler for price to prevent negative values
     const handlePriceChange = (e) => {
@@ -94,7 +98,6 @@ export default function OrganizerEventManagePage() {
                 errorMsg.classList.remove('dark:text-gray-400');
                 
                 errorMsg.classList.add('text-red-500');
-                
                 
                 // Hide the error after 3 seconds
                 setTimeout(() => {
@@ -665,71 +668,129 @@ export default function OrganizerEventManagePage() {
                                 />
                             </div>
                         </form>
-                        {/* Action Buttons - Aligned to the right */}
-                        <div className="flex justify-end gap-4 mt-6 mb-4">
-                            <button className="px-3 py-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
-                                ออกแบบหน้าเว็บ
-                            </button>
-                            <button className="px-3 py-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
-                                จัดการสตาฟ
-                            </button>
-                        </div>
-                    </section>
-                </div>
-                <div className="bg-gray-800 dark:bg-gray-700 text-white p-16 border-primary flex flex-col w-full">
-                    <section>
-                        <div className="px-4 py-2 flex justify-between items-center">
-                            <div className="flex items-center gap-4">
-                                <h2 className="flex flex-col text-2xl font-extrabold mb-4">
-                                    รายการบูธ
-                                </h2>
+                        {/* Action Buttons - Aligned to the right with delete button on the left */}
+                        <div className="flex justify-between mt-6 mb-4">
+                            {/* Delete button on the left */}
+                            <div>
+                                {eventIdName !== "create" && (
+                                    <button 
+                                        onClick={() => setIsDeleteModalOpen(true)}
+                                        className="px-3 py-3 bg-red-600 text-white rounded-lg text-lg font-semibold hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-400 transition"
+                                    >
+                                        ลบอีเวนต์
+                                    </button>
+                                )}
                             </div>
-
-                            <div className="flex items-center gap-4">
-                                <button
-                                    onClick={() =>
-                                        router.push(
-                                            `/organizer/${organizerId}/event/${eventIdName}/booth/create`
-                                        )
-                                    }
-                                    className="px-3 py-3 mt-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition"
-                                >
-                                    สร้างบูธ
+                            
+                            {/* Other action buttons on the right */}
+                            <div className="flex gap-4">
+                                <button className="px-3 py-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
+                                    ออกแบบหน้าเว็บ
+                                </button>
+                                <button className="px-3 py-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
+                                    จัดการสตาฟ
                                 </button>
                             </div>
                         </div>
                     </section>
+                </div>
+                <div id="booths" className="bg-white dark:bg-gray-800 p-8 lg:p-16 border-primary mt-5 flex flex-col w-full rounded-lg shadow-md">
+                    <section>
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                            <h2 className="text-3xl font-bold dark:text-gray-300">รายการบูธ</h2>
 
-                    <section className="mt-8">
+                            <button
+                                onClick={() =>
+                                    router.push(
+                                        `/organizer/${organizerId}/event/${eventIdName}/booth/create`
+                                    )
+                                }
+                                className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400 transition mt-4 md:mt-0"
+                            >
+                                + สร้างบูธใหม่
+                            </button>
+                        </div>
+                    </section>
+
+                    <section>
                         {error && (
                             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
                                 {error}
                             </div>
                         )}
-                        <div className="flex flex-col gap-4">
-                            {booths.length > 0 ? (
-                                booths.map((booth) => (
-                                    <div
-                                        key={booth.booth_id}
-                                        className="bg-white text-gray-600 dark:text-gray-300 dark:bg-gray-900 p-4 rounded-lg shadow"
+                        
+                        {booths && booths.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {booths.map((booth) => (
+                                    <div 
+                                        key={booth.booth_id} 
+                                        className="bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition " //cursor-pointer"
+                                        // onClick={() => router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/${booth.id_name || booth.booth_id}`)}
                                     >
-                                        <h3 className="text-xl font-semibold">
-                                            {booth.name}
-                                        </h3>
-                                        <p className="text-sm mt-2">
-                                            {booth.description}
-                                        </p>
+                                        {/* Booth Banner Image */}
+                                        <div className="h-40 overflow-hidden">
+                                            {booth.banner ? (
+                                                <img
+                                                    src={booth.banner}
+                                                    alt={`${booth.name} banner`}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="h-full w-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center text-white">
+                                                    <span className="text-3xl">🛒</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="p-5">
+                                            <h3 className="text-xl font-semibold mb-2 truncate dark:text-gray-200">{booth.name}</h3>
+                                            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                                                {booth.description || "ไม่มีคำอธิบาย"}
+                                            </p>
+                                            
+                                            {booth.capacity && (
+                                                <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                                                    <span className="mr-2">👥</span>
+                                                    <span>ความจุ: {booth.capacity}</span>
+                                                </div>
+                                            )}
+                                            
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/${booth.id_name || booth.booth_id}`);
+                                                }}
+                                                className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition w-full text-center"
+                                            >
+                                                จัดการบูธ
+                                            </button>
+                                        </div>
                                     </div>
-                                ))
-                            ) : (
-                                <p className="text-gray-400">
-                                    ยังไม่มีบูธในอีเวนต์นี้
-                                </p>
-                            )}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-12 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                <div className="text-4xl mb-4">🛒</div>
+                                <h3 className="text-xl font-medium mb-2">ยังไม่มีบูธ</h3>
+                                <p className="text-gray-600 dark:text-gray-400 mb-6">เพิ่มบูธเพื่อให้ผู้เข้าร่วมอีเวนต์สามารถลงทะเบียนเข้าร่วมได้</p>
+
+                                <button
+                                    onClick={() => router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/create`)}
+                                    className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition"
+                                >
+                                    + สร้างบูธใหม่
+                                </button>
+                            </div>
+                        )}
                     </section>
                 </div>
             </div>
+            <DeleteEventModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                eventId={eventId || eventIdName}
+                eventName={eventName}
+                organizerId={organizerId}
+            />
         </>
     );
 }
