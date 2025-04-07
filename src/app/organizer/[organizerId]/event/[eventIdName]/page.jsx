@@ -347,8 +347,8 @@ export default function OrganizerEventManagePage() {
             return;
         }
 
-        // Skip autosave if we have a 404 error or on empty create mode
-        if (notFound || (eventIdName === "create" && !eventName)) return;
+        // Skip autosave if user is not the owner, or we have a 404 error, or on empty create mode
+        if (!isOwner || notFound || (eventIdName === "create" && !eventName)) return;
 
         // Check if values have changed since last render
         const valuesChanged =
@@ -557,6 +557,7 @@ export default function OrganizerEventManagePage() {
         notFound,
         eventId,
         validateDatesAndTimes,
+        isOwner,
     ]);
 
     // Ensure cleanup when component unmounts
@@ -626,12 +627,14 @@ export default function OrganizerEventManagePage() {
                                 </div>
                             )}
 
-                            {/* Display save status */}
-                            <div
-                                className={`text-right text-sm bg-gray mb-4 ${saveStatus.status}`}
-                            >
-                                {`สถานะการบันทึก: ${saveStatus.message}`}
-                            </div>
+                            {/* Display save status only for owners */}
+                            {isOwner && (
+                                <div
+                                    className={`text-right text-sm bg-gray mb-4 ${saveStatus.status}`}
+                                >
+                                    {`สถานะการบันทึก: ${saveStatus.message}`}
+                                </div>
+                            )}
 
                             {/* Display date and time validation error */}
                             {dateTimeError && (

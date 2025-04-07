@@ -143,7 +143,7 @@ export default function OrganizerNavbar() {
                     </>
                 ) : (
                     <button
-                        onClick={() => signOut({ redirect: true })}
+                        onClick={() => signOut({ callbackUrl: "/" })}
                         className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-400 transition"
                     >
                         ออกจากระบบ
