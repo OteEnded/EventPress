@@ -63,15 +63,15 @@ export async function POST(req) {
             }
         }
         
-        // Check if the event_id_name is valid uuid format
-        if (!projectutility.isValidUUID(request_body.event_id_name)) {
-            // If not, return an error response
-            console.error("API ERROR: Invalid event_id_name uuid format", event_id_name);
-            return NextResponse.json(
-                { message: "Invalid event_id_name uuid format", isSuccess: false },
-                { status: 400 }
-            );
-        }
+        // // Check if the event_id_name is valid uuid format
+        // if (!projectutility.isValidUUID(request_body.event_id_name)) {
+        //     // If not, return an error response
+        //     console.error("API ERROR: Invalid event_id_name uuid format", event_id_name);
+        //     return NextResponse.json(
+        //         { message: "Invalid event_id_name uuid format", isSuccess: false },
+        //         { status: 400 }
+        //     );
+        // }
 
         const event = await Event.getEventByIdName(request_body.event_id_name);
         if (!event) {

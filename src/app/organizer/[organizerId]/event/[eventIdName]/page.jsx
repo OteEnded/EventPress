@@ -54,15 +54,28 @@ const getDisplayDate = (dateString) => {
 const parseDateFromDisplay = (displayDate) => {
     if (!displayDate) return "";
     
+    // Check if the input is already in ISO format (YYYY-MM-DD)
+    if (displayDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return displayDate;
+    }
+    
     // Parse dd/mm/yy format to ISO format (YYYY-MM-DD)
-    const [day, month, year] = displayDate.split('/');
+    const parts = displayDate.split('/');
+    
+    // Make sure we have all parts before proceeding
+    if (parts.length !== 3) return displayDate; // Return original input instead of empty string
+    
+    const [day, month, year] = parts;
+    
+    // Validate each part exists
+    if (!day || !month || !year) return displayDate; // Return original input instead of empty string
     
     // Assume 21st century for two-digit year
     const fullYear = year.length === 2 ? `20${year}` : year;
     
     const dateObj = new Date(`${fullYear}-${month}-${day}`);
     if (isNaN(dateObj.getTime())) {
-        return ""; // Invalid date
+        return displayDate; // Return original input instead of empty string for invalid date
     }
     
     return dateObj.toISOString().split('T')[0]; // Return as YYYY-MM-DD
@@ -488,7 +501,7 @@ export default function OrganizerEventManagePage() {
                                 // If id_name was removed, use the event_id for the URL
                                 // If id_name was changed to something else, use the new id_name
                                 const newPath = idNameWasRemoved 
-                                    ? `/organizer/${organizerId}/event/${eventId}`
+                                    ? `/organizer/${organizerId}/event/${eventId}` 
                                     : `/organizer/${organizerId}/event/${idName}`;
                                     
                                 router.replace(newPath);
@@ -756,10 +769,11 @@ export default function OrganizerEventManagePage() {
                                         onChange={(e) => handleEndDateChange(e)}
                                         min={startDate || new Date().toISOString().split('T')[0]} // Set minimum date to start date or today
                                         className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        disabled={!isOwner}
+                                        disabled={!isOwner || !startDate} // Disable if no start date
                                     />
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                         {endDate ? formatDateToThaiDisplay(endDate) : "วัน เดือน ปี"}
+                                        {!isOwner ? "" : !startDate && " (โปรดเลือกวันที่เริ่มต้นก่อน)"}
                                     </p>
                                 </div>
                             </div>
@@ -798,8 +812,13 @@ export default function OrganizerEventManagePage() {
                                         value={endTime}
                                         onChange={handleEndTimeChange}
                                         className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        disabled={!isOwner}
+                                        disabled={!isOwner || !startTime} // Disable if no start time
                                     />
+                                    {!isOwner ? null : !startTime && 
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                            โปรดเลือกเวลาเริ่มต้นก่อน
+                                        </p>
+                                    }
                                 </div>
                             </div>
 
