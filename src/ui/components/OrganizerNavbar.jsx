@@ -108,11 +108,11 @@ export default function OrganizerNavbar() {
                 )}
                 {!session ? (
                     <>
-                        <Link href="/organizer/staffinvitation">
+                        {/* <Link href="/organizer/staffinvitation">
                             <button className="px-4 py-2 bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 rounded-lg text-sm font-semibold transition border border-gray-300 dark:border-gray-600">
                             รับคำเชิญสตาฟ
                             </button>
-                        </Link>
+                        </Link> */}
                         
                         {/* Dynamically show register button on login page */}
                         {isLoginPage && (
