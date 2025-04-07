@@ -5,6 +5,7 @@ import { eq, and, asc, desc } from "drizzle-orm";
 import projectutility from "@/lib/projectutility";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/next-auth-options";
+import Event from "@/lib/models/Event";
 
 /* res template
 { message: "", content: {}, isSuccess: true }
@@ -44,7 +45,7 @@ export async function POST(req) {
             );
         }
         
-        const requiredFields = ["booth_id_name", "event_id"];
+        const requiredFields = ["booth_id_name", "event_id_name"];
         for (const field of requiredFields) {
             if (!request_body[field]) {
                 console.error(`API ERROR: Missing field ${field}`);
@@ -55,7 +56,7 @@ export async function POST(req) {
             }
         }
         
-        const { booth_id_name, event_id } = request_body;
+        const { booth_id_name, event_id_name } = request_body;
         
         // First try to get booth by booth_id (in case booth_id_name is a UUID)
         let booth = null;
@@ -70,6 +71,8 @@ export async function POST(req) {
             }
         }
         
+        const event = await Event.getEventByIdName(event_id_name);
+        
         // If not found by UUID, try by id_name and event_id (for scoped uniqueness)
         if (!booth) {
             const boothByIdName = await dbConnection
@@ -78,7 +81,7 @@ export async function POST(req) {
                 .where(
                     and(
                         eq(booths.id_name, booth_id_name),
-                        eq(booths.event, event_id)
+                        eq(booths.event, event.event_id),
                     )
                 );
                 

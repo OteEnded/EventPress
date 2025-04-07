@@ -995,13 +995,6 @@ export default function OrganizerEventManagePage() {
                                                     {booth.description || "ไม่มีคำอธิบาย"}
                                                 </p>
                                                 
-                                                {booth.capacity && (
-                                                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
-                                                        <span className="mr-2">👥</span>
-                                                        <span>ความจุ: {booth.capacity}</span>
-                                                    </div>
-                                                )}
-                                                
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();

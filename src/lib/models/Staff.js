@@ -4,6 +4,7 @@ import { users, staffTickets, staffPermissions, events, booths } from "@/databas
 import { eq, and } from "drizzle-orm";
 import User from "@/lib/models/User";
 import Event from "@/lib/models/Event";
+import { sendEmail } from "@/lib/emailservice";
 
 async function getStaffOfUser(userId) {
     const dbConnection = getConnection();
@@ -293,6 +294,10 @@ async function createStaff(reqBody){
         throw new Error("Error creating staff ticket.");
     }
     
+    if (reqBody.verification_email) {
+        sendInviteEmail(staffTicketResult);
+    }
+    
     return staffTicketResult;
 }
 
@@ -497,6 +502,316 @@ async function getStaffByStaffTicketId(staffTicketId) {
     return staffQueryResult[0];
 }
 
+async function sendInviteEmail(staffTicketBody) {
+    // send email to staff
+    const email = staffTicketBody.verification_email;
+    
+    const event = await Event.getEventByEventId(staffTicketBody.event);
+    if (!event) {
+        throw new Error("Event not found.");
+    }
+    
+    const invitationCode = (staffTicketBody.staff_tickets_id.split("-"))[0];
+    
+    const subject = "คุณได้รับการเชิญให้เป็น Staff อีเวนต์จาก EventPress";
+    const body = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Staff Invitation</title>
+            <style>
+                body {
+                    font-family: 'Prompt', 'Helvetica Neue', Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #333333;
+                    background-color: #ffffff;
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+                .header {
+                    background-color: #6366f1;
+                    padding: 20px;
+                    color: #ffffff;
+                    border-radius: 8px 8px 0 0;
+                    text-align: center;
+                }
+                .content {
+                    background-color: #f8fafc;
+                    padding: 30px;
+                    border-left: 1px solid #e2e8f0;
+                    border-right: 1px solid #e2e8f0;
+                    color: #1e293b;
+                }
+                .footer {
+                    background-color: #f1f5f9;
+                    padding: 15px;
+                    color: #475569;
+                    font-size: 14px;
+                    text-align: center;
+                    border-radius: 0 0 8px 8px;
+                    border: 1px solid #e2e8f0;
+                }
+                .event-name {
+                    font-weight: bold;
+                    color: #6366f1;
+                    font-size: 18px;
+                }
+                .invitation-code {
+                    background-color: #f1f5f9;
+                    color: #1e293b;
+                    padding: 12px;
+                    border-radius: 6px;
+                    font-family: monospace;
+                    font-size: 20px;
+                    text-align: center;
+                    letter-spacing: 2px;
+                    margin: 20px 0;
+                    border: 1px dashed #94a3b8;
+                }
+                .button {
+                    display: inline-block;
+                    background-color: #6366f1;
+                    color: #ffffff !important;
+                    padding: 12px 24px;
+                    text-decoration: none;
+                    border-radius: 6px;
+                    margin: 20px 0;
+                    font-weight: bold;
+                }
+                .message {
+                    background-color: #ffffff;
+                    border-left: 4px solid #6366f1;
+                    padding: 15px;
+                    margin: 20px 0;
+                    color: #1e293b;
+                }
+                a {
+                    color: #6366f1;
+                    text-decoration: underline;
+                }
+                h1, h2, p {
+                    color: inherit;
+                }
+                .dark-mode-friendly {
+                    color-scheme: light dark;
+                    -webkit-font-smoothing: antialiased;
+                }
+                @media (prefers-color-scheme: dark) {
+                    /* Dark mode styles are handled by email clients */
+                    /* We're making sure our colors have enough contrast in both modes */
+                }
+            </style>
+        </head>
+        <body class="dark-mode-friendly">
+            <div class="header">
+                <h1 style="color: #ffffff;">EventPress Staff Invitation</h1>
+            </div>
+            
+            <div class="content">
+                <h2>เรียนเจ้าของอีเมล ${email}</h2>
+                
+                <p>คุณได้รับการเชิญให้เป็น Staff อีเวนต์จาก EventPress</p>
+                
+                <p>อีเวนต์: <span class="event-name">${event.name}</span></p>
+                
+                <div class="message">
+                    <p>${staffTicketBody.message || 'เรายินดีที่คุณจะมาร่วมเป็นส่วนหนึ่งของทีมงานในอีเวนต์นี้'}</p>
+                </div>
+                
+                <p><strong>รหัส Invitation Code:</strong></p>
+                <div class="invitation-code">${invitationCode}</div>
+                
+                <div style="text-align: center;">
+                    <a href="http://localhost:8000" class="button">รับคำเชิญ</a>
+                </div>
+                
+                <p>กรุณาเข้าสู่ระบบที่ <a href="http://localhost:8000">EventPress</a> และคลิกที่ปุ่ม "รับคำเชิญ" เพื่อเข้าร่วมเป็น Staff</p>
+            </div>
+            
+            <div class="footer">
+                <p>หากคุณไม่ใช่เจ้าของอีเมลนี้ กรุณาเพิกเฉย</p>
+                <p>&copy; ${new Date().getFullYear()} EventPress - Professional Event Management Platform</p>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    try {
+        const result = await sendEmail(email, subject, body);
+        console.log("Email sent successfully:", result);
+    } catch (error) {
+        console.error("Error sending email:", error);
+        throw new Error("Error sending email.");
+    }
+}
+
+async function sendAcceptEmail(staffTicketId) {
+    
+    const staffTicketBody = await getStaffByStaffTicketId(staffTicketId);
+    
+    // send email to staff
+    const email = staffTicketBody.verification_email;
+    
+    const event = await Event.getEventByEventId(staffTicketBody.event);
+    if (!event) {
+        throw new Error("Event not found.");
+    }
+    
+    const invitationCode = (staffTicketBody.staff_tickets_id.split("-"))[0];
+    
+    const subject = "รหัสยืนยันการเข้าร่วม Staff อีเวนต์จาก EventPress";
+    
+    // email to send validation code to staff (use the invitation code as verification code)
+    const body = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Staff Verification</title>
+            <style>
+                body {
+                    font-family: 'Prompt', 'Helvetica Neue', Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #333333;
+                    background-color: #ffffff;
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+                .header {
+                    background-color: #22c55e;
+                    padding: 20px;
+                    color: #ffffff;
+                    border-radius: 8px 8px 0 0;
+                    text-align: center;
+                }
+                .content {
+                    background-color: #f8fafc;
+                    padding: 30px;
+                    border-left: 1px solid #e2e8f0;
+                    border-right: 1px solid #e2e8f0;
+                    color: #1e293b;
+                }
+                .footer {
+                    background-color: #f1f5f9;
+                    padding: 15px;
+                    color: #475569;
+                    font-size: 14px;
+                    text-align: center;
+                    border-radius: 0 0 8px 8px;
+                    border: 1px solid #e2e8f0;
+                }
+                .event-name {
+                    font-weight: bold;
+                    color: #22c55e;
+                    font-size: 18px;
+                }
+                .verification-code {
+                    background-color: #f1f5f9;
+                    color: #1e293b;
+                    padding: 12px;
+                    border-radius: 6px;
+                    font-family: monospace;
+                    font-size: 24px;
+                    text-align: center;
+                    letter-spacing: 2px;
+                    margin: 20px 0;
+                    border: 1px dashed #22c55e;
+                    font-weight: bold;
+                }
+                .button {
+                    display: inline-block;
+                    background-color: #22c55e;
+                    color: #ffffff !important;
+                    padding: 12px 24px;
+                    text-decoration: none;
+                    border-radius: 6px;
+                    margin: 20px 0;
+                    font-weight: bold;
+                }
+                .success-box {
+                    background-color: #dcfce7;
+                    border-left: 4px solid #22c55e;
+                    padding: 15px;
+                    margin: 20px 0;
+                    color: #166534;
+                }
+                a {
+                    color: #22c55e;
+                    text-decoration: underline;
+                }
+                h1, h2, p {
+                    color: inherit;
+                }
+                .dark-mode-friendly {
+                    color-scheme: light dark;
+                    -webkit-font-smoothing: antialiased;
+                }
+                .check-icon {
+                    font-size: 32px;
+                    color: #22c55e;
+                    margin-right: 10px;
+                }
+                @media (prefers-color-scheme: dark) {
+                    /* Dark mode styles are handled by email clients */
+                    /* We're making sure our colors have enough contrast in both modes */
+                }
+            </style>
+        </head>
+        <body class="dark-mode-friendly">
+            <div class="header">
+                <h1 style="color: #ffffff;">ยืนยันการเข้าร่วมเป็น Staff</h1>
+            </div>
+            
+            <div class="content">
+                <h2>เรียนคุณ ${email}</h2>
+                
+                <p>รหัสยืนยันสำหรับรับคำเชิญ Staff:</p>
+                
+                <div class="verification-code">${invitationCode}</div>
+                
+                <p><strong>วิธีการใช้รหัสยืนยัน:</strong></p>
+                <ol>
+                    <li>เข้าสู่ระบบ EventPress </li>
+                    <li>เลือกตัวเลือกรับคำเชิญ Staff</li>
+                    <li>กรอกรหัสยืนยัน</li>
+                </ol>
+                
+                <p>รายละเอียดอีเวนต์:</p>
+                <ul>
+                    <li>ชื่ออีเวนต์: ${event.name}</li>
+                </ul>
+                
+                <div style="text-align: center;">
+                    <a href="http://localhost:8000" class="button">เข้าสู่ระบบ Staff</a>
+                </div>
+                
+                <p>หากคุณมีข้อสงสัยใดๆ กรุณาติดต่อผู้จัดงานได้โดยตรง</p>
+            </div>
+            
+            <div class="footer">
+                <p>ขอบคุณที่เป็นส่วนหนึ่งของความสำเร็จในอีเวนต์นี้</p>
+                <p>&copy; ${new Date().getFullYear()} EventPress - Professional Event Management Platform</p>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    try {
+        const result = await sendEmail(email, subject, body);
+        console.log("Verification email sent successfully:", result);
+        return result;
+    } catch (error) {
+        console.error("Error sending verification email:", error);
+        throw new Error("Error sending verification email.");
+    }
+}
+
+
 export default {
     getStaffOfUser,
     getStaffOfEvent,
@@ -505,6 +820,6 @@ export default {
     createStaff,
     updateStaff,
     deleteStaff,
-    getStaffByStaffTicketId
+    getStaffByStaffTicketId,
     
 }

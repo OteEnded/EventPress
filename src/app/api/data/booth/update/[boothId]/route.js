@@ -89,6 +89,10 @@ export async function POST(req, { params }) {
         if (request_body.banner !== undefined) {
             updateData.banner = request_body.banner;
         }
+        
+        if (request_body.id_name !== undefined) {
+            updateData.id_name = request_body.id_name;
+        }
 
         // If event is being updated, validate that the event exists
         if (request_body.event !== undefined) {

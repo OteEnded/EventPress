@@ -25,7 +25,6 @@ export default function OrganizerBoothManagePage() {
     const [boothDescription, setBoothDescription] = useState("");
     const [boothLocation, setBoothLocation] = useState("");
     const [contactInfo, setContactInfo] = useState("");
-    const [capacity, setCapacity] = useState("");
     const [boothId, setBoothId] = useState(""); // Store the actual booth_id
     const [eventId, setEventId] = useState(""); // Store the actual event_id
 
@@ -38,8 +37,7 @@ export default function OrganizerBoothManagePage() {
         idName,
         boothDescription,
         boothLocation,
-        contactInfo,
-        capacity
+        contactInfo
     });
 
     const timeoutIdRef = useRef(null);
@@ -161,7 +159,7 @@ export default function OrganizerBoothManagePage() {
                         method: "POST",
                         body: JSON.stringify({ 
                             booth_id_name: boothIdName,
-                            event_id: eventIdName
+                            event_id_name: eventIdName
                         }),
                         headers: {
                             "Content-Type": "application/json",
@@ -183,7 +181,6 @@ export default function OrganizerBoothManagePage() {
                 setBoothDescription(data.content.description || "");
                 setBoothLocation(data.content.location || "");
                 setContactInfo(data.content.contact_info || "");
-                setCapacity(data.content.capacity || "");
                 setBoothId(data.content.booth_id || ""); // Set the actual booth_id
                 setEventId(data.content.event || ""); // Set the event ID
                 setActivities(data.content.Activities || []); // Set activities
@@ -218,8 +215,7 @@ export default function OrganizerBoothManagePage() {
             previousValues.current.idName !== idName ||
             previousValues.current.boothDescription !== boothDescription ||
             previousValues.current.boothLocation !== boothLocation ||
-            previousValues.current.contactInfo !== contactInfo ||
-            previousValues.current.capacity !== capacity;
+            previousValues.current.contactInfo !== contactInfo;
 
         // Only update status and set timeout if values have changed
         if (valuesChanged) {
@@ -242,7 +238,6 @@ export default function OrganizerBoothManagePage() {
                 boothDescription,
                 boothLocation,
                 contactInfo,
-                capacity,
             };
 
             // Define autosave function to be called after timeout
@@ -298,7 +293,6 @@ export default function OrganizerBoothManagePage() {
                         description: boothDescription,
                         location: boothLocation,
                         contact_info: contactInfo,
-                        capacity,
                         event: actualEventId, // Use the actual event UUID, not the ID name
                     };
 
@@ -413,7 +407,6 @@ export default function OrganizerBoothManagePage() {
         boothDescription,
         boothLocation,
         contactInfo,
-        capacity,
         boothIdName,
         eventIdName,
         organizerId,
@@ -589,24 +582,6 @@ export default function OrganizerBoothManagePage() {
                                     name="contact_info"
                                     value={contactInfo}
                                     onChange={(e) => setContactInfo(e.target.value)}
-                                    className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                />
-                            </div>
-
-                            {/* Booth Capacity */}
-                            <div className="mb-4">
-                                <label
-                                    htmlFor="capacity"
-                                    className="block text-lg font-medium text-gray-700 dark:text-gray-300"
-                                >
-                                    จำนวนที่รับ
-                                </label>
-                                <input
-                                    type="text"
-                                    id="capacity"
-                                    name="capacity"
-                                    value={capacity}
-                                    onChange={(e) => setCapacity(e.target.value)}
                                     className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 />
                             </div>
