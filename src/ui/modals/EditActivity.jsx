@@ -277,25 +277,61 @@ export default function EditActivity({ isOpen, onClose, activityId, initialData 
 								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
 									เวลาเริ่มต้น
 								</label>
-								<input
-									type="time"
-									id="activity_start_time"
-									value={startTime}
-									onChange={(e) => setStartTime(e.target.value)}
-									className="block p-3 w-full text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-								/>
+								<div className="flex items-center">
+									<input
+										type="time"
+										id="activity_start_time"
+										value={startTime}
+										onChange={(e) => setStartTime(e.target.value)}
+										className="block p-3 w-full text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+									/>
+									{startTime && (
+										<button
+											type="button"
+											onClick={() => {
+												setStartTime("");
+												setEndTime(""); // Clear end time as well
+											}}
+											className="p-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md"
+										>
+											<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 dark:text-gray-300" viewBox="0 0 20 20" fill="currentColor">
+												<path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+											</svg>
+										</button>
+									)}
+								</div>
 							</div>
 							<div className="flex-1">
 								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
 									เวลาสิ้นสุด
 								</label>
-								<input
-									type="time"
-									id="activity_end_time"
-									value={endTime}
-									onChange={(e) => setEndTime(e.target.value)}
-									className="block p-3 w-full text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-								/>
+								<div className="flex items-center">
+									<input
+										type="time"
+										id="activity_end_time"
+										value={endTime}
+										onChange={(e) => setEndTime(e.target.value)}
+										className="block p-3 w-full text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+										disabled={!startTime}
+									/>
+									{endTime && (
+										<button
+											type="button"
+											onClick={() => setEndTime("")}
+											className="p-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md"
+											disabled={!startTime}
+										>
+											<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 dark:text-gray-300" viewBox="0 0 20 20" fill="currentColor">
+												<path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+											</svg>
+										</button>
+									)}
+									{!startTime && (
+										<p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+											โปรดเลือกเวลาเริ่มต้นก่อน
+										</p>
+									)}
+								</div>
 							</div>
 						</div>
 						

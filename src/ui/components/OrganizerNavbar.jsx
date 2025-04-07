@@ -70,8 +70,8 @@ export default function OrganizerNavbar() {
         return `${profile.firstname} ${profile.lastname}`;
     };
 
-    // Check if user is a system admin
-    const isSystemAdmin = userData?.SystemAdmin !== null;
+    // Check if user is a system admin - only when userData is loaded
+    const isSystemAdmin = userData ? userData.SystemAdmin !== null : false;
 
     return (
         <div className="px-4 py-2 flex justify-between items-center bg-gray-100 dark:bg-gray-800">

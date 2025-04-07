@@ -104,7 +104,7 @@ export default async function OrganizerDashboardPage() {
 									<h2 className="text-2xl font-bold text-gray-800 dark:text-white">
 										{organize.organizer.name}
 									</h2>
-									<p className="text-gray-600 dark:text-gray-400 text-sm">
+									<p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-1 max-w-[75%]">
 										{organize.organizer.description || "ไม่มีคำอธิบายองค์กร"}
 									</p>
 									{/* Approval Status Badge */}
