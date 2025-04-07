@@ -22,7 +22,7 @@ import { staffPermissions } from "./entities/staff_permissions.js";
 export {
     
     // Enums
-    choiceFileTypes,
+    // choiceFileTypes,
     choiceSigninMethods,
     choicePermissionTypes,
     choiceEventLayers,

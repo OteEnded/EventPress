@@ -7,24 +7,48 @@ import path from "path";
 import fs from "fs/promises";
 import formidable from "formidable";
 
-async function uploadFile(file) {
+async function createFile(req){
+    
     const dbConnection = getConnection();
-    const filePath = path.join(process.cwd(), "public", "uploads", file.file_id, file.name);
-    const fileDir = path.dirname(filePath);
-
-    try {
-        await fs.mkdir(fileDir, { recursive: true });
-        await fs.writeFile(filePath, file.data);
-    } catch (error) {
-        console.error("Error writing file:", error);
-        throw error;
-    }
-
-    return await dbConnection.insert(files).values({
-        name: file.name,
-        type: file.type,
-        file_name_extension: path.extname(file.name),
-        size: file.size,
-        description: file.description,
+    
+    const result = await dbConnection.insert(files).values({
+        name: req.name,
+        type: req.type,
+        file_name_extension: req.file_name_extension,
+        size: req.size,
+        description: req.description
     }).returning();
+    
+    return result[0];
+    
+}
+
+async function deleteFile(fileId) {
+    const dbConnection = getConnection();
+    const result = (await dbConnection.delete(files).where(eq(files.file_id, fileId)).returning())[0];
+    if (!result) {
+        throw new Error(`File with ID ${fileId} not found or failed to delete.`);
+    }
+    
+    // file deteleted from database, now delete the file from the filesystem
+    const uploadDir = path.join(process.cwd(), "uploads");
+    
+    return result;
+}
+
+async function getFileByFileId(fileId) {
+    const dbConnection = getConnection();
+    const result = await dbConnection.select().from(files).where(eq(files.file_id, fileId));
+    
+    if (!result) {
+        throw new Error(`File with ID ${fileId} not found.`);
+    }
+    
+    return result[0];
+}
+
+export default {
+    createFile,
+    deleteFile,
+    getFileByFileId,
 }

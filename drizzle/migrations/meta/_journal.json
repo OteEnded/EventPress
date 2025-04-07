@@ -127,6 +127,13 @@
       "when": 1744012144988,
       "tag": "0017_change_staff_ticket_email_field_name",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1744059242432,
+      "tag": "0018_file_type_to_string",
+      "breakpoints": true
     }
   ]
 }

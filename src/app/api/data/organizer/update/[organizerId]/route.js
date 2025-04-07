@@ -66,26 +66,26 @@ export async function POST(req, { params }) {
             }
         }
 
-        // Check if owner is a valid UUID
-        if (!projectutility.isValidUUID(request_body.owner)) {
-            console.error("API ERROR: Invalid owner UUID");
-            return NextResponse.json(
-                { error: "Invalid owner UUID" },
-                { status: 400 }
-            );
-        }
+        // // Check if owner is a valid UUID
+        // if (!projectutility.isValidUUID(request_body.owner)) {
+        //     console.error("API ERROR: Invalid owner UUID");
+        //     return NextResponse.json(
+        //         { error: "Invalid owner UUID" },
+        //         { status: 400 }
+        //     );
+        // }
 
-        // Check if the owner exists in the database
-        const userExists = await dbConnection.select()
-            .from(users)
-            .where(eq(users.user_id, request_body.owner));
-        if (userExists.length === 0) {
-            console.error("API ERROR: Owner user does not exist");
-            return NextResponse.json(
-                { error: "Owner user does not exist" },
-                { status: 400 }
-            );
-        }
+        // // Check if the owner exists in the database
+        // const userExists = await dbConnection.select()
+        //     .from(users)
+        //     .where(eq(users.user_id, request_body.owner));
+        // if (userExists.length === 0) {
+        //     console.error("API ERROR: Owner user does not exist");
+        //     return NextResponse.json(
+        //         { error: "Owner user does not exist" },
+        //         { status: 400 }
+        //     );
+        // }
 
         // Update the organizer in the database
         const organizerData = {};
@@ -98,6 +98,7 @@ export async function POST(req, { params }) {
         if (request_body.email !== undefined) organizerData.email = request_body.email;
         if (request_body.phone_number !== undefined) organizerData.phone_number = request_body.phone_number;
         if (request_body.address !== undefined) organizerData.address = request_body.address;
+        if (request_body.logo !== undefined) organizerData.logo = request_body.logo;
 
         const result = await dbConnection.update(organizers)
             .set(organizerData)

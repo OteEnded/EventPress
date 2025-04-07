@@ -116,7 +116,9 @@ export default function OrganizerDetailPage() {
                 
                 // Set logo if available
                 if (organizerData.logo) {
-                    setLogoPreview(organizerData.logo);
+                    setLogoPreview(`/api/data/file/load?id=${organizerData.logo}`);
+                } else {
+                    setLogoPreview(null);
                 }
                 
                 if (organizerData.ownerData) {
@@ -226,6 +228,12 @@ export default function OrganizerDetailPage() {
         }
     };
 
+    // Function to handle image error (404 not found)
+    const handleImageError = () => {
+        console.log("Logo image failed to load, removing preview");
+        setLogoPreview(null);
+    };
+
     // Function to remove logo
     const handleRemoveLogo = () => {
         setLogo(null);
@@ -244,19 +252,66 @@ export default function OrganizerDetailPage() {
                 status: saveStatusStyleEnum.LOADING,
             });
 
+            let logoFileId = null;
+
+            // Upload logo if a new one was selected
+            if (logo) {
+                try {
+                    const formData = new FormData();
+                    formData.append("file", logo);
+                    formData.append("description", "Organization logo");
+
+                    const uploadResponse = await fetch("/api/data/file/upload", {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    if (!uploadResponse.ok) {
+                        throw new Error("Failed to upload logo");
+                    }
+
+                    const uploadResult = await uploadResponse.json();
+                    if (!uploadResult.isSuccess) {
+                        throw new Error(uploadResult.error || "Failed to upload logo");
+                    }
+
+                    logoFileId = uploadResult.content.file_id;
+                    console.log("Logo uploaded successfully:", logoFileId);
+                } catch (uploadError) {
+                    console.error("Error uploading logo:", uploadError);
+                    setSaveStatus({
+                        message: "เกิดข้อผิดพลาดในการอัปโหลดโลโก้",
+                        status: saveStatusStyleEnum.ERROR,
+                    });
+                    // Continue with other updates even if logo upload fails
+                }
+            }
+
+            const organizerData = {
+                name,
+                description,
+                website,
+                email,
+                phone_number: phoneNumber,
+                address,
+            };
+
+            // Only add logo if we have a new one
+            if (logoFileId) {
+                organizerData.logo = logoFileId;
+            }
+
+            // If logoPreview is null and had a previous logo, set logo to null to remove it
+            if (logoPreview === null && previousValues.current.logo !== null) {
+                organizerData.logo = null;
+            }
+
             const response = await fetch(`/api/data/organizer/update/${organizerId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    name,
-                    description,
-                    website,
-                    email,
-                    phone_number: phoneNumber,
-                    address,
-                }),
+                body: JSON.stringify(organizerData),
             });
 
             if (!response.ok) {
@@ -438,6 +493,7 @@ export default function OrganizerDetailPage() {
                                                 src={logoPreview}
                                                 alt="Organization logo"
                                                 className="w-full h-full object-cover"
+                                                onError={handleImageError}
                                             />
                                         ) : (
                                             <div className="text-4xl text-gray-400 dark:text-gray-500">🏢</div>

@@ -10,9 +10,8 @@ import Events from "@/lib/models/Event";
 */
 
 export async function POST(req, { params }) {
-    
     const param = await params;
-    
+
     const dbConnection = getConnection();
 
     try {
@@ -38,7 +37,7 @@ export async function POST(req, { params }) {
         }
 
         // Ensure required fields exist
-        const requiredFields = ["name", "organizer"];
+        const requiredFields = [];
         for (const field of requiredFields) {
             if (!request_body[field]) {
                 console.error(`API ERROR: Missing field ${field}`);
@@ -49,27 +48,28 @@ export async function POST(req, { params }) {
             }
         }
 
-        // Check if organizer is a valid UUID
-        if (!projectutility.isValidUUID(request_body.organizer)) {
-            console.error("API ERROR: Invalid organizer UUID");
-            return NextResponse.json(
-                { error: "Invalid organizer UUID" },
-                { status: 400 }
-            );
+        // Check if the organizer exists in the database
+        if (request_body.organizer) {
+            if (!projectutility.isValidUUID(request_body.organizer)) {
+                console.error("API ERROR: Invalid organizer UUID format");
+                return NextResponse.json(
+                    { error: "Invalid organizer UUID format" },
+                    { status: 400 }
+                );
+            }
+            const organizerExists = await dbConnection
+                .select()
+                .from(organizers)
+                .where(eq(organizers.organizer_id, request_body.organizer));
+            if (organizerExists.length === 0) {
+                console.error("API ERROR: Organizer does not exist");
+                return NextResponse.json(
+                    { error: "Organizer does not exist" },
+                    { status: 400 }
+                );
+            }
         }
 
-        // Check if the organizer exists in the database
-        const organizerExists = await dbConnection.select()
-            .from(organizers)
-            .where(eq(organizers.organizer_id, request_body.organizer));
-        if (organizerExists.length === 0) {
-            console.error("API ERROR: Organizer does not exist");
-            return NextResponse.json(
-                { error: "Organizer does not exist" },
-                { status: 400 }
-            );
-        }
-        
         // Check if the event exists in the database
         const eventExists = await Events.getEventByIdName(eventId);
         if (!eventExists) {
@@ -80,11 +80,11 @@ export async function POST(req, { params }) {
             );
         }
         const resolvedEventId = eventExists.event_id;
-        
-        
+
         // Check if id_name is a not existing id_name in the database
         if (request_body.id_name) {
-            const idNameExists = await dbConnection.select()
+            const idNameExists = await dbConnection
+                .select()
                 .from(events)
                 .where(
                     and(
@@ -92,7 +92,7 @@ export async function POST(req, { params }) {
                         not(eq(events.event_id, resolvedEventId))
                     )
                 );
-            
+
             if (idNameExists.length > 0) {
                 console.error("API ERROR: id_name already exists");
                 return NextResponse.json(
@@ -103,22 +103,50 @@ export async function POST(req, { params }) {
         }
 
         // Update the event in the database
-        const eventData = {
-            name: request_body.name,
-            id_name: request_body.id_name || null,
-            description: request_body.description || null,
-            location: request_body.location || null,
-            start_date: request_body.start_date || null,
-            end_date: request_body.end_date || null,
-            start_time: request_body.start_time || null,
-            end_time: request_body.end_time || null,
-            capacity: request_body.capacity || null,
-            price: request_body.price || 0.0,
-            contact_info: request_body.contact_info || null,
-            organizer: request_body.organizer
-        };
+        const eventData = {};
 
-        const result = await dbConnection.update(events)
+        if (request_body.name !== undefined) {
+            eventData.name = request_body.name;
+        }
+        if (request_body.id_name !== undefined) {
+            eventData.id_name = request_body.id_name;
+        }
+        if (request_body.description !== undefined) {
+            eventData.description = request_body.description;
+        }
+        if (request_body.location !== undefined) {
+            eventData.location = request_body.location;
+        }
+        if (request_body.start_date !== undefined) {
+            eventData.start_date = request_body.start_date;
+        }
+        if (request_body.end_date !== undefined) {
+            eventData.end_date = request_body.end_date;
+        }
+        if (request_body.start_time !== undefined) {
+            eventData.start_time = request_body.start_time;
+        }
+        if (request_body.end_time !== undefined) {
+            eventData.end_time = request_body.end_time;
+        }
+        if (request_body.capacity !== undefined) {
+            eventData.capacity = request_body.capacity;
+        }
+        if (request_body.price !== undefined) {
+            eventData.price = request_body.price;
+        }
+        if (request_body.contact_info !== undefined) {
+            eventData.contact_info = request_body.contact_info;
+        }
+        if (request_body.organizer !== undefined) {
+            eventData.organizer = request_body.organizer;
+        }
+        if (request_body.banner !== undefined) {
+            eventData.banner = request_body.banner;
+        }
+
+        const result = await dbConnection
+            .update(events)
             .set(eventData)
             .where(eq(events.event_id, resolvedEventId))
             .returning();
@@ -133,10 +161,13 @@ export async function POST(req, { params }) {
 
         projectutility.log("Event updated:", result);
         return NextResponse.json(
-            { message: "Event updated successfully", content: result[0], isSuccess: true },
+            {
+                message: "Event updated successfully",
+                content: result[0],
+                isSuccess: true,
+            },
             { status: 200 }
         );
-
     } catch (error) {
         console.error("API ERROR:", error);
         return NextResponse.json(

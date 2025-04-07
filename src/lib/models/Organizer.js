@@ -19,6 +19,8 @@ async function getOrganizerByOrganizerId(organizerId) {
         return null;
     }
     
+    console.log("Organizer query result:", organizerQueryResult);
+    
     const organizer = {
         ...organizerQueryResult[0],
         expand: async function() {

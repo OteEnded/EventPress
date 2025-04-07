@@ -28,6 +28,12 @@ export default function OrganizerBoothManagePage() {
     const [boothId, setBoothId] = useState(""); // Store the actual booth_id
     const [eventId, setEventId] = useState(""); // Store the actual event_id
 
+    // Banner state
+    const [banner, setBanner] = useState(null); // File object for upload
+    const [bannerPreview, setBannerPreview] = useState(null); // URL for preview
+    const [isBannerUploading, setIsBannerUploading] = useState(false);
+    const [bannerUploadError, setBannerUploadError] = useState(null);
+
     // State for activities
     const [activities, setActivities] = useState([]);
 
@@ -184,6 +190,11 @@ export default function OrganizerBoothManagePage() {
                 setBoothId(data.content.booth_id || ""); // Set the actual booth_id
                 setEventId(data.content.event || ""); // Set the event ID
                 setActivities(data.content.Activities || []); // Set activities
+                
+                // Set banner if available from API
+                if (data.content.banner) {
+                    setBannerPreview(`/api/data/file/load?id=${data.content.banner}`);
+                }
             } catch (error) {
                 console.error("Error fetching booth data:", error);
                 setError("An error occurred while fetching booth data.");
@@ -197,6 +208,144 @@ export default function OrganizerBoothManagePage() {
             }
         });
     }, [boothIdName, eventIdName]);
+
+    // Handle banner upload
+    const handleBannerUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setIsBannerUploading(true);
+        setBannerUploadError(null);
+
+        try {
+            // Create form data
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("description", "Booth banner");
+
+            // Upload the file
+            const response = await fetch("/api/data/file/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to upload banner");
+            }
+
+            const result = await response.json();
+            
+            if (!result.isSuccess) {
+                throw new Error(result.error || "Failed to upload banner");
+            }
+
+            // Get the file ID from the response
+            const fileId = result.content.file_id;
+            
+            // Update the banner in the database
+            const updateResponse = await fetch(
+                `/api/data/booth/update/${boothId || boothIdName}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        banner: fileId
+                    }),
+                }
+            );
+
+            if (!updateResponse.ok) {
+                throw new Error("Failed to update booth with banner");
+            }
+
+            // Set the banner preview URL using the file loading API
+            setBannerPreview(`/api/data/file/load?id=${fileId}`);
+            setBanner(file);
+            setIsBannerUploading(false);
+            
+            // Show success message in the save status
+            setSaveStatus({
+                message: "บันทึกแบนเนอร์สำเร็จ",
+                status: saveStatusStatusStyleEnum.SUCCESS,
+            });
+            
+            // Reset success status after 3 seconds
+            setTimeout(() => {
+                setSaveStatus({
+                    message: "ข้อมูลถูกบันทึกแล้ว",
+                    status: saveStatusStatusStyleEnum.SUCCESS,
+                });
+                // refresh the page to show the new banner
+                window.location.reload();
+            }, 3000);
+        } catch (error) {
+            console.error("Error uploading banner:", error);
+            setBannerUploadError("เกิดข้อผิดพลาดในการอัพโหลดแบนเนอร์");
+            setIsBannerUploading(false);
+            
+            // Show error in the save status
+            setSaveStatus({
+                message: "เกิดข้อผิดพลาดในการอัพโหลดแบนเนอร์",
+                status: saveStatusStatusStyleEnum.ERROR,
+            });
+        }
+    };
+
+    // Handle banner removal
+    const handleRemoveBanner = async () => {
+        try {
+            setBannerUploadError(null);
+
+            // Update the booth in the database to remove the banner
+            const updateResponse = await fetch(
+                `/api/data/booth/update/${boothId || boothIdName}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        banner: null
+                    }),
+                }
+            );
+
+            if (!updateResponse.ok) {
+                throw new Error("Failed to remove banner");
+            }
+
+            // Clear banner state
+            setBanner(null);
+            setBannerPreview(null);
+            
+            // Show success message
+            setSaveStatus({
+                message: "ลบแบนเนอร์สำเร็จ",
+                status: saveStatusStatusStyleEnum.SUCCESS,
+            });
+            
+            // Reset success status after 3 seconds
+            setTimeout(() => {
+                setSaveStatus({
+                    message: "ข้อมูลถูกบันทึกแล้ว",
+                    status: saveStatusStatusStyleEnum.SUCCESS,
+                });
+                // refresh the page to show the updated state
+                window.location.reload();
+            }, 3000);
+        } catch (error) {
+            console.error("Error removing banner:", error);
+            setBannerUploadError("เกิดข้อผิดพลาดในการลบแบนเนอร์");
+            
+            // Show error in the save status
+            setSaveStatus({
+                message: "เกิดข้อผิดพลาดในการลบแบนเนอร์",
+                status: saveStatusStatusStyleEnum.ERROR,
+            });
+        }
+    };
 
     // Autosave functionality
     useEffect(() => {
@@ -546,7 +695,7 @@ export default function OrganizerBoothManagePage() {
                                     onChange={(e) => setBoothDescription(e.target.value)}
                                     rows="4"
                                     className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                    required
+                                    // required
                                 ></textarea>
                             </div>
 
@@ -585,6 +734,75 @@ export default function OrganizerBoothManagePage() {
                                     className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 />
                             </div>
+
+                            {/* Banner Upload Section - Only show when not in create mode */}
+                            {boothIdName !== "create" && (
+                                <div className="mb-8">
+                                    <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        แบนเนอร์บูธ
+                                    </label>
+                                    <div className="flex flex-col items-center">
+                                        {/* Banner preview area */}
+                                        <div className="w-full h-48 mb-4 overflow-hidden bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                                            {bannerPreview ? (
+                                                <img 
+                                                    src={bannerPreview} 
+                                                    alt="Booth banner preview" 
+                                                    className="w-full h-full object-cover"
+                                                    onError={() => setBannerPreview(null)}
+                                                />
+                                            ) : (
+                                                <div className="flex flex-col items-center text-gray-500 dark:text-gray-400">
+                                                    <span className="text-5xl mb-2">🖼️</span>
+                                                    <span>ยังไม่มีแบนเนอร์</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        
+                                        {/* Banner upload buttons */}
+                                        <div className="flex flex-wrap gap-3 justify-center">
+                                            <label className="px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                                </svg>
+                                                อัพโหลดแบนเนอร์
+                                                <input 
+                                                    type="file" 
+                                                    accept="image/*"
+                                                    className="hidden" 
+                                                    onChange={handleBannerUpload}
+                                                    disabled={isBannerUploading}
+                                                />
+                                            </label>
+                                            
+                                            {bannerPreview && (
+                                                <button 
+                                                    onClick={handleRemoveBanner}
+                                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-400 transition flex items-center"
+                                                    disabled={isBannerUploading}
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                    </svg>
+                                                    ลบแบนเนอร์
+                                                </button>
+                                            )}
+                                        </div>
+                                        
+                                        {/* Upload status/error message */}
+                                        {isBannerUploading && (
+                                            <div className="mt-2 text-blue-500 dark:text-blue-400">
+                                                กำลังอัพโหลดแบนเนอร์...
+                                            </div>
+                                        )}
+                                        {bannerUploadError && (
+                                            <div className="mt-2 text-red-500 dark:text-red-400">
+                                                {bannerUploadError}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </form>
                         {/* Action Buttons - Aligned to the right with delete button on the left */}
                         <div className="flex justify-between mt-6 mb-4">
