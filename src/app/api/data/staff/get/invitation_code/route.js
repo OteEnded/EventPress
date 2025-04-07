@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
-import User from "@/lib/models/User";
 import projectutility from "@/lib/projectutility";
+import Event from "@/lib/models/Event";
+import Organizer from "@/lib/models/Organizer";
+import User from "@/lib/models/User";
+
+import Staff from "@/lib/models/Staff";
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/next-auth-options";
 
@@ -16,12 +21,24 @@ export async function POST(req) {
         
         console.log("Session:", session);
     
-        if (!session) {
+        if (!session || !session.user) {
+            console.error("API ERROR: Unauthorized access", session);
             return NextResponse.json(
                 { message: "Unauthorized access", isSuccess: false },
                 { status: 401 }
             );
         }
+        
+        const currentUser = await User.getUserByIdentityEmail(session.user.email);
+        if (!currentUser) {
+            console.error("API ERROR: Unauthorized access, user not found", session.user.email);
+            return NextResponse.json(
+                { message: "Unauthorized access, user not found", isSuccess: false },
+
+                { status: 401 }
+            );
+        }
+        
         
         let request_body;
         try {
@@ -34,7 +51,7 @@ export async function POST(req) {
             );
         }
         
-        const requiredFields = ["identity_email"];
+        const requiredFields = ["invitation_code"];
         
         for (const field of requiredFields) {
             if (!request_body[field]) {
@@ -46,18 +63,25 @@ export async function POST(req) {
             }
         }
         
-        let user = await User.getUserByIdentityEmail(request_body.identity_email);
-        if (!user) {
+        
+        const staff = await Staff.getStaffByInvitationCode(request_body.invitation_code);
+        if (staff.length === 0) {
+            console.error("API ERROR: Staff not found", request_body.invitation_code);
             return NextResponse.json(
-                { message: "User not found", isSuccess: false },
+                { message: "Staff not found", isSuccess: false },
                 { status: 404 }
             );
         }
-        
-        user = await user.expand();
+        if (staff.length > 1) {
+            console.error("API ERROR: Multiple staff found with the same invitation code", request_body.invitation_code);
+            return NextResponse.json(
+                { message: "Error: Multiple staff found with the same invitation code, Please contact support", isSuccess: false },
+                { status: 500 }
+            );
+        }
 
         return NextResponse.json(
-            { message: "User retrieved successfully", content: user, isSuccess: true },
+            { message: "Event retrieved successfully", content: staff[0], isSuccess: true },
             { status: 200 }
         );
         

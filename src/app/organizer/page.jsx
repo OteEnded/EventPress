@@ -86,9 +86,9 @@ export default async function OrganizerDashboardPage() {
 				<div key={`${organize["organizer"]["organizer_id"]}`} className="mb-12">
 					<div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 mb-6 shadow-md">
 						<div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-							<div className="flex items-center mb-4 md:mb-0">
+							<div className="flex items-center mb-4 md:mb-0 max-w-[75%]">
 								{/* Organizer Logo - Handle base64 or use placeholder */}
-								<div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-4 overflow-hidden">
+								<div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-4 overflow-hidden flex-shrink-0">
 									{organize.organizer.logo ? (
 										<img 
 											src={organize.organizer.logo} 
@@ -100,11 +100,11 @@ export default async function OrganizerDashboardPage() {
 									)}
 								</div>
 								
-								<div>
-									<h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+								<div className="overflow-hidden">
+									<h2 className="text-2xl font-bold text-gray-800 dark:text-white truncate">
 										{organize.organizer.name}
 									</h2>
-									<p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-1 max-w-[75%]">
+									<p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-1">
 										{organize.organizer.description || "ไม่มีคำอธิบายองค์กร"}
 									</p>
 									{/* Approval Status Badge */}

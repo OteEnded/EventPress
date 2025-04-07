@@ -1,7 +1,7 @@
 import projectutility from "@/lib/projectutility";
 import { getConnection } from "@/lib/dbconnector";
 import { users, staffTickets, staffPermissions, events, booths } from "@/database/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql  } from "drizzle-orm";
 import User from "@/lib/models/User";
 import Event from "@/lib/models/Event";
 import { sendEmail } from "@/lib/emailservice";
@@ -502,6 +502,28 @@ async function getStaffByStaffTicketId(staffTicketId) {
     return staffQueryResult[0];
 }
 
+async function getStaffByInvitationCode(invitationCode) {
+    const dbConnection = getConnection();
+    
+    if (!invitationCode) {
+        throw new Error("Invitation Code is required.");
+    }
+    
+    if (typeof invitationCode !== "string") {
+        throw new Error("Invitation Code must be a string.");
+    }
+    
+    // check if invitation code is valid
+    // the invitation code is the first part of the staff ticket id
+    const pattern = invitationCode + "-%";
+    const staffQueryResult = await dbConnection
+        .select()
+        .from(staffTickets)
+        .where(sql`${staffTickets.staff_tickets_id}::text LIKE ${pattern}`);
+    
+    return staffQueryResult;
+}
+
 async function sendInviteEmail(staffTicketBody) {
     // send email to staff
     const email = staffTicketBody.verification_email;
@@ -655,12 +677,12 @@ async function sendAcceptEmail(staffTicketId) {
     // send email to staff
     const email = staffTicketBody.verification_email;
     
-    const event = await Event.getEventByEventId(staffTicketBody.event);
+    const event = staffTicketBody.event;
     if (!event) {
         throw new Error("Event not found.");
     }
     
-    const invitationCode = (staffTicketBody.staff_tickets_id.split("-"))[0];
+    const verificationCode = (staffTicketBody.staff_tickets_id.split("-"))[staffTicketBody.staff_tickets_id.split("-").length - 1];
     
     const subject = "รหัสยืนยันการเข้าร่วม Staff อีเวนต์จาก EventPress";
     
@@ -772,7 +794,7 @@ async function sendAcceptEmail(staffTicketId) {
                 
                 <p>รหัสยืนยันสำหรับรับคำเชิญ Staff:</p>
                 
-                <div class="verification-code">${invitationCode}</div>
+                <div class="verification-code">${verificationCode}</div>
                 
                 <p><strong>วิธีการใช้รหัสยืนยัน:</strong></p>
                 <ol>
@@ -821,5 +843,8 @@ export default {
     updateStaff,
     deleteStaff,
     getStaffByStaffTicketId,
+    getStaffByInvitationCode,
+    sendInviteEmail,
+    sendAcceptEmail
     
 }
