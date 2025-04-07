@@ -4,9 +4,7 @@ import Event from "@/lib/models/Event";
 import Organizer from "@/lib/models/Organizer";
 import User from "@/lib/models/User";
 
-import { getConnection } from "@/lib/dbconnector";
-import { events, organizers, users } from "@/database/schema";
-import { eq } from "drizzle-orm";
+import Staff from "@/lib/models/Staff";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/next-auth-options";
@@ -55,6 +53,26 @@ export async function POST(req) {
         
         const requiredFields = ["event_id_name"];
         
+        for (const field of requiredFields) {
+            if (!request_body[field]) {
+                console.error(`API ERROR: Missing field ${field}`);
+                return NextResponse.json(
+                    { message: `Missing field ${field}`, isSuccess: false },
+                    { status: 400 }
+                );
+            }
+        }
+        
+        // Check if the event_id_name is valid uuid format
+        if (!projectutility.isValidUUID(request_body.event_id_name)) {
+            // If not, return an error response
+            console.error("API ERROR: Invalid event_id_name uuid format", event_id_name);
+            return NextResponse.json(
+                { message: "Invalid event_id_name uuid format", isSuccess: false },
+                { status: 400 }
+            );
+        }
+
         const event = await Event.getEventByIdName(request_body.event_id_name);
         if (!event) {
             console.error("API ERROR: Event not found", request_body.event_id_name);
@@ -66,12 +84,27 @@ export async function POST(req) {
         
         const organizer = await Organizer.getOrganizerByOrganizerId(event.organizer);
         
-        event.isOwner = currentUser.user_id === organizer.owner;
+        if(currentUser.user_id !== organizer.owner){
+            console.error("API ERROR: Unauthorized access, user is not the owner", session.user.email);
+            return NextResponse.json(
+                { message: "Unauthorized access, user is not the owner", isSuccess: false },
+
+                { status: 401 }
+            );
+        }
         
-        console.log("Event data:", event);
+        const staff = await Staff.getStaffOfEvent(event.event_id);
+        
+        /*
+        return example
+        [
+        
+        ]
+        */
+        
 
         return NextResponse.json(
-            { message: "Event retrieved successfully", content: event, isSuccess: true },
+            { message: "Event retrieved successfully", content: staff, isSuccess: true },
             { status: 200 }
         );
         

@@ -1,6 +1,6 @@
 import projectutility from "@/lib/projectutility";
 import { getConnection } from "@/lib/dbconnector";
-import { users, userProfiles, userCredentials, userSigninMethods, systemAdmins } from "@/database/schema";
+import { users, userProfiles, userCredentials, userSigninMethods, systemAdmins, lower } from "@/database/schema";
 import { eq } from "drizzle-orm";
 import Organizer from "./Organizer";
 
@@ -13,7 +13,8 @@ async function getUserByUserId(userId) {
     const dbConnection = getConnection();
     
     if (!userId) {
-        throw new Error("User ID is required.");
+        console.error("User ID is required. Didn't find user_id in the request.");
+        return null;
     }
     
     if (!projectutility.isValidUUID(userId)) {
@@ -88,7 +89,7 @@ async function expandUser(user) {
 async function getUserByIdentityEmail(identityEmail) {
     const dbConnection = getConnection();
     
-    const user = await dbConnection.select({user_id: users.user_id}).from(users).where(eq(users.identity_email, identityEmail));
+    const user = await dbConnection.select({user_id: users.user_id}).from(users).where(eq(lower(users.identity_email), identityEmail.toLowerCase()));
     if (user.length === 0) {
         return null;
     }

@@ -39,45 +39,47 @@ export async function middleware(req) {
         }).catch((err) => console.error("Log request failed:", err));
     }
 
-    const staticBaseRoutes = [
-        "api",
-        "organizer",
-        "_next",
-        "favicon.ico",
-        "manifest.json",
-        "robots.txt",
-        "sitemap.xml",
-        "service-worker.js",
-        "sw.js",
-        "workbox-.*",
-        "assets",
-        "event",
-        "events",
-        "organizers",
-        "login",
-        "logout",
-        "register",
-        "set-theme",
-        "theme",
-        "test",
-        ""
-    ];
-    const isStaticBaseRoute = staticBaseRoutes.includes(urlPath[1]);
+    // const staticBaseRoutes = [
+    //     "api",
+    //     "organizer",
+    //     "_next",
+    //     "favicon.ico",
+    //     "manifest.json",
+    //     "robots.txt",
+    //     "sitemap.xml",
+    //     "service-worker.js",
+    //     "sw.js",
+    //     "workbox-.*",
+    //     "assets",
+    //     "event",
+    //     "events",
+    //     "organizers",
+    //     "login",
+    //     "logout",
+    //     "register",
+    //     "set-theme",
+    //     "theme",
+    //     "test",
+    //     ""
+    // ];
+    // const isStaticBaseRoute = staticBaseRoutes.includes(urlPath[1]);
 
-    // Check if event exists in the database but if urlPath[1] is in staticBaseRoutes, just return false
-    const isEvent = isStaticBaseRoute ? false : true; // await checkIfEventExists(urlPath[1]);
+    // // Check if event exists in the database but if urlPath[1] is in staticBaseRoutes, just return false
+    // const isEvent = isStaticBaseRoute ? false : true; // await checkIfEventExists(urlPath[1]);
 
-    if (!isStaticBaseRoute && isEvent) {
-        const newPath = req.nextUrl.pathname.replace(
-            `/${urlPath[1]}`,
-            `/event/${urlPath[1]}`
-        );
-        console.log("MIDDLEWARE: " + newPath);
-        return NextResponse.rewrite(new URL(newPath, req.url));
-    }
+    // if (!isStaticBaseRoute && isEvent && false) {
+    //     const newPath = req.nextUrl.pathname.replace(
+    //         `/${urlPath[1]}`,
+    //         `/event/${urlPath[1]}`
+    //     );
+    //     console.log("MIDDLEWARE: " + newPath);
+    //     return NextResponse.rewrite(new URL(newPath, req.url));
+    // }
 
+    
     // console.log("MIDDLEWARE: " + req.cookies);
     // console.log(req.cookies.get("theme")?.value);
+    
     const theme = req.cookies.get("theme")?.value || "dark";
     const res = NextResponse.next();
     res.headers.set("X-Theme", theme);

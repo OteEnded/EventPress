@@ -3,7 +3,7 @@ import { Pool } from "pg";
 import putil from "./projectutility.js";
 import * as models from "@/database/schema.js"; // Import all models
 
-let db = null;
+var db = null;
 
 export function getConnection() {
     if (!db) {

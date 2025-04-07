@@ -41,8 +41,8 @@ async function registerAsOrganizer(req) {
     // }
     
     // select user by email
-    const usersInDB = dbConnection.select().from(users).where(eq(users.identity_email, req.indentity_email));
-    if (usersInDB.length > 0) {
+    const usersInDB = await User.getUserByIdentityEmail(req.indentity_email);
+    if (usersInDB) {
         console.error("API ERROR: This email address is already registered.", req.indentity_email);
         return { error: "This email address is already registered." };
     }
@@ -121,13 +121,12 @@ async function login(req) {
     try {
         const dbConnection = getConnection();
         
-        const selectedUser = await dbConnection.select().from(users).where(eq(users.identity_email, req.indentity_email));
-        if (selectedUser.length < 1) {
+        const targetUser = await User.getUserByIdentityEmail(req.indentity_email);
+        if (!targetUser) {
             console.error(`Cannot find the user with email: ${req.indentity_email}`);
             return null;
         }
-        
-        const targetUser = selectedUser[0];
+
         const targetUserCredential = (await dbConnection.select().from(userCredentials).where(eq(userCredentials.user, targetUser.user_id)))[0];
         if (!targetUserCredential) {
             console.error(`Cannot find the user credentials for user with email: ${req.indentity_email}`);

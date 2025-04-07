@@ -1,21 +1,20 @@
-import nodemailer from "nodemailer";
+import nodemailer from 'nodemailer';
 
 export const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
+  host: 'smtp-relay.brevo.com',
+  port: 587,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.BREVO_EMAIL,
+    pass: process.env.BREVO_API_KEY,
+  },
 });
 
-export const sendNoReplyEmail = async (to, subject, html) => {
-    await transporter.sendMail({
-        from: `"No Reply" <${process.env.EMAIL_USER}>`,
-        to,
-        subject,
-        html,
-        headers: {
-            "Reply-To": "no-reply@eventpress.com",
-        },
-    });
+export const sendEmail = async (to, subject, html) => {
+  return await transporter.sendMail({
+    from: `"EventPress" <ratnarit.j@ku.th>`,
+    to,
+    subject,
+    html,
+  });
 };

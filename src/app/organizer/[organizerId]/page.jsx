@@ -29,7 +29,7 @@ export default function OrganizerDetailPage() {
     const [address, setAddress] = useState("");
     const [owner, setOwner] = useState("");
     const [ownerData, setOwnerData] = useState(null);
-    const [approver, setApprover] = useState(null); // Add state for approver
+    const [approver, setApprover] = useState(null);
 
     // State for delete organizer modal
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -45,6 +45,7 @@ export default function OrganizerDetailPage() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
     const [notFound, setNotFound] = useState(false);
+    const [isOwner, setIsOwner] = useState(false); // Track actual ownership status
 
     // Autosave states
     const saveStatusStyleEnum = {
@@ -101,6 +102,9 @@ export default function OrganizerDetailPage() {
 
                 const organizerData = data.content;
 
+                // Set ownership status from API response
+                setIsOwner(data.content.isOwner !== false); // Default to true if not explicitly false
+                
                 // Set organizer data to state
                 setName(organizerData.name || "");
                 setDescription(organizerData.description || "");
@@ -252,7 +256,6 @@ export default function OrganizerDetailPage() {
                     email,
                     phone_number: phoneNumber,
                     address,
-                    owner,
                 }),
             });
 
@@ -375,9 +378,6 @@ export default function OrganizerDetailPage() {
             </div>
         );
     }
-
-    // Check if current user is the owner
-    const isOwner = true; //session && session.user && session.user.id === owner;
 
     return (
         <div className="min-h-screen flex flex-col bg-[#5E9BD6] dark:bg-gray-900 text-gray-700 dark:text-white px-6">

@@ -4,6 +4,7 @@ import { users, organizers, events, booths } from "@/database/schema";
 import { eq, or, asc, desc } from "drizzle-orm";
 import Organizer from "./Organizer";
 import User from "./User";
+import Staff from "./Staff";
 
 async function getEventByEventId(eventId) {
     const dbConnection = getConnection();
@@ -103,6 +104,22 @@ async function getEventsOfUser(userId) {
             .select()
             .from(organizers)
             .orderBy(desc(organizers.created_at));
+        
+        if (organizersOfUser) {
+            for (const organizer of organizersOfUser) {
+                const events = await getEventsByOrganizerId(organizer.organizer_id);
+                
+                result.push({
+                    organizer: organizer,
+                    isOwner: organizer.owner === userId,
+                    events: events,
+                });
+                
+            }
+        }
+        
+        return result;
+        
     }
     else {
         // get all organizers of the user
@@ -121,10 +138,7 @@ async function getEventsOfUser(userId) {
             
         }
     }
-    
-    if (user.SystemAdmin) {
-        return result;
-    }
+
     
     // get events of the user
     // get events which the user is not the owner but is a participant

@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import projectutility from "@/lib/projectutility";
 import Event from "@/lib/models/Event";
 import Organizer from "@/lib/models/Organizer";
-import projectutility from "@/lib/projectutility";
 import User from "@/lib/models/User";
+
+import Staff from "@/lib/models/Staff";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/next-auth-options";
@@ -12,11 +14,13 @@ import { authOptions } from "@/lib/auth/next-auth-options";
 */
 
 export async function POST(req) {
+    
     try {
+        
         const session = await getServerSession(authOptions);
-
+        
         console.log("Session:", session);
-
+    
         if (!session || !session.user) {
             console.error("API ERROR: Unauthorized access", session);
             return NextResponse.json(
@@ -24,25 +28,18 @@ export async function POST(req) {
                 { status: 401 }
             );
         }
-
-        const currentUser = await User.getUserByIdentityEmail(
-            session.user.email
-        );
+        
+        const currentUser = await User.getUserByIdentityEmail(session.user.email);
         if (!currentUser) {
-            console.error(
-                "API ERROR: Unauthorized access, user not found",
-                session.user.email
-            );
+            console.error("API ERROR: Unauthorized access, user not found", session.user.email);
             return NextResponse.json(
-                {
-                    message: "Unauthorized access, user not found",
-                    isSuccess: false,
-                },
+                { message: "Unauthorized access, user not found", isSuccess: false },
 
                 { status: 401 }
             );
         }
-
+        
+        
         let request_body;
         try {
             request_body = await req.json();
@@ -53,51 +50,47 @@ export async function POST(req) {
                 { status: 400 }
             );
         }
-
-        const requiredFields = ["organizer_id"];
-
+        
+        const requiredFields = [
+            "staff_tickets_id",
+            "event",
+            // "verification_email",
+            // "valid_until",
+            // "note",
+            // "message",
+            // "connected_user",
+            // "Booths"
+        ];
+        
         for (const field of requiredFields) {
             if (!request_body[field]) {
+                console.error(`API ERROR: Missing field ${field}`);
                 return NextResponse.json(
-                    { message: `${field} is required`, isSuccess: false },
+                    { message: `Missing field ${field}`, isSuccess: false },
                     { status: 400 }
                 );
             }
         }
-
-        let organizer;
-        try {
-            organizer = await Organizer.getOrganizerByOrganizerId(
-                request_body.organizer_id
-            );
-            if (!organizer) {
-                return NextResponse.json(
-                    { message: "Organizer not found", isSuccess: false },
-                    { status: 404 }
-                );
-            }
-        } catch (error) {
-            console.error("API ERROR: Failed to get organizer", error);
-            return NextResponse.json(
-                { message: "Organizer not found", isSuccess: false },
-                { status: 404 }
-            );
-        }
-
-        organizer = await organizer.expand();
-
-        console.log("Organizer data:", organizer);
         
-        organizer.isOwner = organizer.owner === currentUser.user_id;
+        const createResult = await Staff.createStaff(
+            {
+                staff_tickets_id: request_body.staff_tickets_id,
+                verification_email: request_body.verification_email,
+                valid_until: request_body.valid_until,
+                note: request_body.note,
+                message: request_body.message,
+                connected_user: request_body.connected_user,
+                booths: request_body.Booths || [],
+                event: request_body.event,
+            }
+        );
+        
 
         return NextResponse.json(
-            {
-                message: "Organizer retrieved successfully",
-                content: organizer,
-                isSuccess: true,
-            },
+            { message: "Event create successfully", content: createResult, isSuccess: true },
             { status: 200 }
         );
+        
     } catch (error) {
         console.error("API ERROR:", error);
         return NextResponse.json(

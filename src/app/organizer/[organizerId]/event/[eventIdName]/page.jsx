@@ -85,6 +85,7 @@ export default function OrganizerEventManagePage() {
     const [eventLocation, setEventLocation] = useState("");
     const [contactInfo, setContactInfo] = useState("");
     const [eventId, setEventId] = useState(""); // Store the actual event_id
+    const [isOwner, setIsOwner] = useState(true); // Track if the current user is the owner
 
     // State for validations
     const [dateTimeError, setDateTimeError] = useState(null);
@@ -313,6 +314,9 @@ export default function OrganizerEventManagePage() {
                 setContactInfo(data.content.contact_info || "");
                 setBooths(data.content.Booths || []); // Set booths from the event data
                 setEventId(data.content.event_id || ""); // Set the actual event_id
+                
+                // Set the isOwner flag based on API response
+                setIsOwner(data.content.isOwner !== false); // Default to true if not explicitly false
             } catch (error) {
                 console.error("Error fetching event data:", error);
                 setError("An error occurred while fetching event data.");
@@ -641,6 +645,7 @@ export default function OrganizerEventManagePage() {
                                     }
                                     className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     required
+                                    disabled={!isOwner}
                                 />
                             </div>
 
@@ -660,6 +665,7 @@ export default function OrganizerEventManagePage() {
                                     onChange={handleIdNameChange}
                                     className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="ชื่อที่สั้นๆ ที่ใช้เรียกอีเวนต์ใน URL เช่น ku_openhouse_2025"
+                                    disabled={!isOwner}
                                 />
                                 <p id="id-name-error" className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                     ใช้ได้เฉพาะตัวอักษรภาษาอังกฤษ, ตัวเลข, ขีดล่าง (_) และเครื่องหมายขีด (-) เท่านั้น
@@ -684,6 +690,7 @@ export default function OrganizerEventManagePage() {
                                     rows="4"
                                     className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     required
+                                    disabled={!isOwner}
                                 ></textarea>
                             </div>
 
@@ -705,6 +712,7 @@ export default function OrganizerEventManagePage() {
                                     }
                                     className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     required
+                                    disabled={!isOwner}
                                 />
                             </div>
 
@@ -726,6 +734,7 @@ export default function OrganizerEventManagePage() {
                                         min={new Date().toISOString().split('T')[0]} // Set minimum date to today
                                         className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         required
+                                        disabled={!isOwner}
                                     />
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                         {startDate ? formatDateToThaiDisplay(startDate) : "วัน เดือน ปี"}
@@ -747,6 +756,7 @@ export default function OrganizerEventManagePage() {
                                         onChange={(e) => handleEndDateChange(e)}
                                         min={startDate || new Date().toISOString().split('T')[0]} // Set minimum date to start date or today
                                         className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        disabled={!isOwner}
                                     />
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                         {endDate ? formatDateToThaiDisplay(endDate) : "วัน เดือน ปี"}
@@ -770,6 +780,7 @@ export default function OrganizerEventManagePage() {
                                         value={startTime}
                                         onChange={handleStartTimeChange}
                                         className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        disabled={!isOwner}
                                     />
                                 </div>
 
@@ -787,6 +798,7 @@ export default function OrganizerEventManagePage() {
                                         value={endTime}
                                         onChange={handleEndTimeChange}
                                         className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        disabled={!isOwner}
                                     />
                                 </div>
                             </div>
@@ -808,6 +820,7 @@ export default function OrganizerEventManagePage() {
                                         setEventCapacity(e.target.value)
                                     }
                                     className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    disabled={!isOwner}
                                 />
                             </div>
 
@@ -828,6 +841,7 @@ export default function OrganizerEventManagePage() {
                                     style={hideNumberInputSpinners}
                                     className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     min="0"
+                                    disabled={!isOwner}
                                 />
                             </div>
 
@@ -848,6 +862,7 @@ export default function OrganizerEventManagePage() {
                                         setContactInfo(e.target.value)
                                     }
                                     className="mt-1 p-2 block w-full border-gray-300 bg-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    disabled={!isOwner}
                                 />
                             </div>
                         </form>
@@ -855,7 +870,7 @@ export default function OrganizerEventManagePage() {
                         <div className="flex justify-between mt-6 mb-4">
                             {/* Delete button on the left */}
                             <div>
-                                {eventIdName !== "create" && (
+                                {eventIdName !== "create" && isOwner && (
                                     <button 
                                         onClick={() => setIsDeleteModalOpen(true)}
                                         className="px-3 py-3 bg-red-600 text-white rounded-lg text-lg font-semibold hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-400 transition"
@@ -867,12 +882,40 @@ export default function OrganizerEventManagePage() {
                             
                             {/* Other action buttons on the right */}
                             <div className="flex gap-4">
-                                <button className="px-3 py-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
-                                    ออกแบบหน้าเว็บ
-                                </button>
-                                <button className="px-3 py-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition">
-                                    จัดการสตาฟ
-                                </button>
+                                {isOwner ? (
+                                    <>
+                                        <button 
+                                            className="px-3 py-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition"
+                                        >
+                                            ออกแบบหน้าเว็บ
+                                        </button>
+                                        <button 
+                                            className="px-3 py-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition"
+                                            onClick={() =>
+                                                router.push(`/organizer/${organizerId}/event/${eventIdName}/staff`)
+                                            }
+                                        >
+                                            จัดการสตาฟ
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button 
+                                            className="px-3 py-3 bg-gray-400 text-white rounded-lg text-lg font-semibold cursor-not-allowed dark:bg-gray-600"
+                                            disabled
+                                            title="คุณไม่มีสิทธิ์แก้ไขอีเวนต์นี้"
+                                        >
+                                            ออกแบบหน้าเว็บ
+                                        </button>
+                                        <button 
+                                            className="px-3 py-3 bg-gray-400 text-white rounded-lg text-lg font-semibold cursor-not-allowed dark:bg-gray-600"
+                                            disabled
+                                            title="คุณไม่มีสิทธิ์แก้ไขอีเวนต์นี้"
+                                        >
+                                            จัดการสตาฟ
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </section>

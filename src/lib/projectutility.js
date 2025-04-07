@@ -117,6 +117,11 @@ export function isValidUUID(uuid) {
     return uuidRegex.test(uuid);
 }
 
+export function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
 export default {
     readJSONFile,
     getConfig,
@@ -127,4 +132,5 @@ export default {
     objLen,
     getDBConnectionConfig,
     isValidUUID,
+    isValidEmail,
 };
