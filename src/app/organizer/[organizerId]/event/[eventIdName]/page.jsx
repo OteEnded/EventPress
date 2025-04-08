@@ -100,6 +100,8 @@ export default function OrganizerEventManagePage() {
     const [eventId, setEventId] = useState(""); // Store the actual event_id
     const [isOwner, setIsOwner] = useState(true); // Track if the current user is the owner
     const [eventAttendees, setEventAttendees] = useState([]); // Store event attendees
+    const [isPublished, setIsPublished] = useState(false); // Track if the event is published
+    const [isPublishLoading, setIsPublishLoading] = useState(false); // Track publish button loading state
     
     // Banner state
     const [banner, setBanner] = useState(null); // File object for upload
@@ -509,6 +511,9 @@ export default function OrganizerEventManagePage() {
                 
                 // Set the isOwner flag based on API response
                 setIsOwner(data.content.isOwner !== false); // Default to true if not explicitly false
+                
+                // Set published state
+                setIsPublished(data.content.isPublished || false);
             } catch (error) {
                 console.error("Error fetching event data:", error);
                 setError("An error occurred while fetching event data.");
@@ -1137,6 +1142,56 @@ export default function OrganizerEventManagePage() {
                                     disabled={!isOwner}
                                 />
                             </div>
+
+                            {/* Event Published Toggle */}
+                            {eventIdName !== "create" && (
+                                <div className="mb-8">
+                                    <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        สถานะการเผยแพร่
+                                    </label>
+                                    <div className="flex items-center">
+                                        <button
+                                            onClick={async () => {
+                                                setIsPublishLoading(true);
+                                                try {
+                                                    const response = await fetch(
+                                                        `/api/data/event/update/${eventId || eventIdName}`,
+                                                        {
+                                                            method: "POST",
+                                                            headers: {
+                                                                "Content-Type": "application/json",
+                                                            },
+                                                            body: JSON.stringify({
+                                                                isPublished: !isPublished,
+                                                            }),
+                                                        }
+                                                    );
+                                                    if (!response.ok) {
+                                                        throw new Error("Failed to update publish status");
+                                                    }
+                                                    setIsPublished(!isPublished);
+                                                } catch (error) {
+                                                    console.error("Error updating publish status:", error);
+                                                } finally {
+                                                    setIsPublishLoading(false);
+                                                }
+                                            }}
+                                            className={`px-4 py-2 rounded-lg font-semibold transition ${
+                                                isPublished
+                                                    ? "bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400"
+                                                    : "bg-gray-400 text-white hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-500"
+                                            }`}
+                                            disabled={isPublishLoading}
+                                        >
+                                            {isPublishLoading
+                                                ? "กำลังโหลด..."
+                                                : isPublished
+                                                ? "เผยแพร่แล้ว"
+                                                : "ยังไม่เผยแพร่"}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Event Attendees Count */}
                             {eventIdName !== "create" && (

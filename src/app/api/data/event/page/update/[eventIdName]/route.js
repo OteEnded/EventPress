@@ -1,13 +1,7 @@
 import { NextResponse } from "next/server";
-import projectutility from "@/lib/projectutility";
 import Event from "@/lib/models/Event";
-import Organizer from "@/lib/models/Organizer";
 import User from "@/lib/models/User";
 import Page from "@/lib/models/Page";
-
-import { getConnection } from "@/lib/dbconnector";
-import { events, organizers, users } from "@/database/schema";
-import { eq } from "drizzle-orm";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/next-auth-options";
@@ -18,8 +12,6 @@ import { authOptions } from "@/lib/auth/next-auth-options";
 
 export async function POST(req, { params }) {
     const param = await params;
-
-    const dbConnection = getConnection();
     
     try {
         

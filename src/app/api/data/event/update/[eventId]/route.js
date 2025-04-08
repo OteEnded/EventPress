@@ -148,6 +148,9 @@ export async function POST(req, { params }) {
         if (request_body.banner !== undefined) {
             eventData.banner = request_body.banner;
         }
+        if (request_body.isPublished !== undefined) {
+            eventData.published = request_body.isPublished;
+        }
 
         const result = await dbConnection
             .update(events)
