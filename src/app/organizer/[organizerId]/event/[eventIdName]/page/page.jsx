@@ -283,6 +283,8 @@ export default function EventPageCustomize() {
   const [event, setEvent] = useState(null);
   const [page, setPage] = useState(null);
   const [widgets, setWidgets] = useState([]);
+  // Add state for error refresh countdown
+  const [errorRefreshCountdown, setErrorRefreshCountdown] = useState(null);
 
   // State for UI interaction
   const [activeWidgetIndex, setActiveWidgetIndex] = useState(0);
@@ -298,6 +300,8 @@ export default function EventPageCustomize() {
       try {
         setIsLoading(true);
         setError(null);
+        // Reset error refresh countdown
+        setErrorRefreshCountdown(null);
 
         // First fetch the event data
         const eventResponse = await fetch("/api/data/event/get/event_id_name", {
@@ -387,11 +391,30 @@ export default function EventPageCustomize() {
           error.message || "An error occurred while loading the page"
         );
         setIsLoading(false);
+
+        // Start countdown for auto-refresh (15 seconds)
+        setErrorRefreshCountdown(15);
       }
     }
 
     fetchData();
   }, [eventIdName]);
+
+  // Handle auto-refresh countdown
+  useEffect(() => {
+    if (errorRefreshCountdown === null) return;
+
+    if (errorRefreshCountdown === 0) {
+      window.location.reload();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setErrorRefreshCountdown((prev) => (prev !== null ? prev - 1 : null));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [errorRefreshCountdown]);
 
   // Update widget options
   const handleUpdateWidget = (index, newOptions) => {
@@ -709,6 +732,11 @@ export default function EventPageCustomize() {
           </div>
           <h2 className="text-2xl font-bold mb-4 dark:text-white text-center">เกิดข้อผิดพลาด</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">{error}</p>
+          {errorRefreshCountdown !== null && (
+            <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">
+              กำลังรีเฟรชใน {errorRefreshCountdown} วินาที...
+            </p>
+          )}
           <div className="flex justify-center">
             <Link 
               href={`/organizer/${organizerId}/event/${eventIdName}`}

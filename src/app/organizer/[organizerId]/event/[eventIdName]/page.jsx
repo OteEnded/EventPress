@@ -1276,16 +1276,26 @@ export default function OrganizerEventManagePage() {
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
                                 <h2 className="text-3xl font-bold dark:text-gray-300">รายการบูธ</h2>
 
-                                <button
-                                    onClick={() =>
-                                        router.push(
-                                            `/organizer/${organizerId}/event/${eventIdName}/booth/create`
-                                        )
-                                    }
-                                    className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400 transition mt-4 md:mt-0"
-                                >
-                                    + สร้างบูธใหม่
-                                </button>
+                                {isOwner ? (
+                                    <button
+                                        onClick={() =>
+                                            router.push(
+                                                `/organizer/${organizerId}/event/${eventIdName}/booth/create`
+                                            )
+                                        }
+                                        className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400 transition mt-4 md:mt-0"
+                                    >
+                                        + สร้างบูธใหม่
+                                    </button>
+                                ) : (
+                                    <button
+                                        className="px-4 py-2 bg-gray-400 text-white rounded-lg font-semibold cursor-not-allowed dark:bg-gray-600 transition mt-4 md:mt-0"
+                                        disabled
+                                        title="คุณไม่มีสิทธิ์สร้างบูธในอีเวนต์นี้"
+                                    >
+                                        + สร้างบูธใหม่
+                                    </button>
+                                )}
                             </div>
                         </section>
 
@@ -1343,12 +1353,22 @@ export default function OrganizerEventManagePage() {
                                     <h3 className="text-xl font-medium mb-2">ยังไม่มีบูธ</h3>
                                     <p className="text-gray-600 dark:text-gray-400 mb-6">เพิ่มบูธเพื่อให้ผู้เข้าร่วมอีเวนต์สามารถลงทะเบียนเข้าร่วมได้</p>
 
-                                    <button
-                                        onClick={() => router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/create`)}
-                                        className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition"
-                                    >
-                                        + สร้างบูธใหม่
-                                    </button>
+                                    {isOwner ? (
+                                        <button
+                                            onClick={() => router.push(`/organizer/${organizerId}/event/${eventIdName}/booth/create`)}
+                                            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition"
+                                        >
+                                            + สร้างบูธใหม่
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className="px-6 py-3 bg-gray-400 text-white rounded-lg font-semibold cursor-not-allowed dark:bg-gray-600"
+                                            disabled
+                                            title="คุณไม่มีสิทธิ์สร้างบูธในอีเวนต์นี้"
+                                        >
+                                            + สร้างบูธใหม่
+                                        </button>
+                                    )}
                                 </div>
                             )}
                         </section>

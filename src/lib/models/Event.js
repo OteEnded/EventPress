@@ -1,10 +1,11 @@
 import projectutility from "@/lib/projectutility";
 import { getConnection } from "@/lib/dbconnector";
-import { users, organizers, events, booths, eventAttendees } from "@/database/schema";
+import { users, organizers, events, booths, eventAttendees, staffTickets } from "@/database/schema";
 import { eq, or, asc, desc } from "drizzle-orm";
 import Organizer from "./Organizer";
 import User from "./User";
 import Staff from "./Staff";
+
 
 async function getEventByEventId(eventId) {
     const dbConnection = getConnection();
@@ -129,6 +130,9 @@ async function getEventsOfUser(userId) {
     else {
         // get all organizers of the user
         organizersOfUser = await Organizer.getOrganizersByOwnerUserId(userId);
+        if (!organizersOfUser) {
+            organizersOfUser = []
+        }
     }
     
     if (organizersOfUser) {
@@ -148,7 +152,38 @@ async function getEventsOfUser(userId) {
     // get events of the user
     // get events which the user is not the owner but is a participant
     
+    const organizerIds = organizersOfUser.map((organizer) => organizer.organizer_id);
     
+    const staffTicketsQueryResult = await dbConnection
+        .select()
+        .from(staffTickets)
+        .where(eq(staffTickets.connected_user, userId))
+    
+    const EventsOfStaffTickets = [];
+        
+    for (const staffTicket of staffTicketsQueryResult) {
+        const event = await getEventByEventId(staffTicket.event);
+        if (!organizerIds.includes(event.organizer)) {
+            if (!EventsOfStaffTickets.map((i) => i.organizer.organizer_id).includes(event.organizer)) {
+                
+                const organizerObj = await Organizer.getOrganizerByOrganizerId(event.organizer);
+                
+                EventsOfStaffTickets.push({
+                    organizer: organizerObj,
+                    isOwner: false,
+                    events: [
+                        event,
+                    ],
+                })
+            }
+            else {
+                const index = EventsOfStaffTickets.map((i) => i.organizer.organizer_id).indexOf(event.organizer);
+                EventsOfStaffTickets[index].events.push(event);
+            }
+        }
+    }
+    
+    result.push(...EventsOfStaffTickets);
     
     return result;
 }

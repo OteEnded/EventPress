@@ -5,8 +5,8 @@ import Organizer from "@/lib/models/Organizer";
 import User from "@/lib/models/User";
 
 import { getConnection } from "@/lib/dbconnector";
-import { events, organizers, users } from "@/database/schema";
-import { eq } from "drizzle-orm";
+import { events, organizers, users, staffPermissions, staffTickets, booths } from "@/database/schema";
+import { eq, and } from "drizzle-orm";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/next-auth-options";
@@ -77,6 +77,39 @@ export async function POST(req) {
         const organizer = await Organizer.getOrganizerByOrganizerId(event.organizer);
         
         event.isOwner = currentUser.user_id === organizer.owner;
+        
+        if (!event.isOwner) {
+            const dbConnection = getConnection();
+            const relatedStaffTickets = await dbConnection.
+                select().from(staffTickets).where(
+                    and(
+                        eq(staffTickets.event, event.event_id),
+                        eq(staffTickets.connected_user, currentUser.user_id)
+                    )
+                );
+            console.log("Related Staff Tickets:", relatedStaffTickets);
+            if (relatedStaffTickets.length == 1){
+                console.log("Staff Ticket:", relatedStaffTickets[0]);
+                const visibleBoothOfStaffTicket = await dbConnection.
+                    select().from(staffPermissions).where(
+                        eq(staffPermissions.staff_ticket, relatedStaffTickets[0].staff_tickets_id)
+                    );
+                console.log("Visible Booth of Staff Ticket:", visibleBoothOfStaffTicket);
+                const resolvedBooths = [];
+                for (const staffPermissions of visibleBoothOfStaffTicket) {
+                    const booth = await dbConnection.
+                        select().from(booths).where(
+                            eq(booths.booth_id, staffPermissions.booth)
+                        );
+                    console.log("Booth:", booth);
+                    if (booth.length > 0) {
+                        resolvedBooths.push(booth[0]);
+                    }
+                }
+                event.Booths = resolvedBooths;
+            }
+            
+        }
         
         console.log("Event data:", event);
 

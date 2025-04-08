@@ -647,10 +647,10 @@ async function sendInviteEmail(staffTicketBody) {
                 <div class="invitation-code">${invitationCode}</div>
                 
                 <div style="text-align: center;">
-                    <a href="http://localhost:8000" class="button">รับคำเชิญ</a>
+                    <a href="https://secretly-big-lobster.ngrok-free.app" class="button">รับคำเชิญ</a>
                 </div>
                 
-                <p>กรุณาเข้าสู่ระบบที่ <a href="http://localhost:8000">EventPress</a> และคลิกที่ปุ่ม "รับคำเชิญ" เพื่อเข้าร่วมเป็น Staff</p>
+                <p>กรุณาเข้าสู่ระบบที่ <a href="https://secretly-big-lobster.ngrok-free.app">EventPress</a> และคลิกที่ปุ่ม "รับคำเชิญ" เพื่อเข้าร่วมเป็น Staff</p>
             </div>
             
             <div class="footer">
@@ -809,7 +809,7 @@ async function sendAcceptEmail(staffTicketId) {
                 </ul>
                 
                 <div style="text-align: center;">
-                    <a href="http://localhost:8000" class="button">เข้าสู่ระบบ Staff</a>
+                    <a href="https://secretly-big-lobster.ngrok-free.app" class="button">เข้าสู่ระบบ Staff</a>
                 </div>
                 
                 <p>หากคุณมีข้อสงสัยใดๆ กรุณาติดต่อผู้จัดงานได้โดยตรง</p>

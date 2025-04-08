@@ -13,19 +13,6 @@ const shortenUuid = (uuid) => {
 	return uuid.split("-")[0];
 };
 
-// Add function to copy text to clipboard
-const copyToClipboard = (text) => {
-	navigator.clipboard.writeText(text)
-		.then(() => {
-			// Show temporary success message or toast notification
-			setShowCopySuccess(true);
-			setTimeout(() => setShowCopySuccess(false), 2000);
-		})
-		.catch(err => {
-			console.error('Failed to copy: ', err);
-		});
-};
-
 export default function OrganizerEventStaffIndexPage() {
 	const { organizerId, eventIdName } = useParams();
 	const router = useRouter();
@@ -45,6 +32,19 @@ export default function OrganizerEventStaffIndexPage() {
 
 	// Add state for copy success message
 	const [showCopySuccess, setShowCopySuccess] = useState(false);
+	
+	// Function to copy text to clipboard - moved inside component to access state
+	const copyToClipboard = (text) => {
+		navigator.clipboard.writeText(text)
+			.then(() => {
+				// Show temporary success message or toast notification
+				setShowCopySuccess(true);
+				setTimeout(() => setShowCopySuccess(false), 2000);
+			})
+			.catch(err => {
+				console.error('Failed to copy: ', err);
+			});
+	};
 	
 	// Fetch staff data
 	useEffect(() => {
@@ -235,7 +235,7 @@ export default function OrganizerEventStaffIndexPage() {
 												{shortenUuid(selectedStaff.staff_tickets_id)}
 											</p>
 											<button
-												onClick={() => copyToClipboard(selectedStaff.staff_tickets_id)}
+												onClick={() => copyToClipboard(selectedStaff.staff_tickets_id.split("-")[0])}
 												className="p-1.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md text-gray-700 dark:text-gray-300 transition"
 												title="คัดลอกรหัสสตาฟทั้งหมด"
 											>
