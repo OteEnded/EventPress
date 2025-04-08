@@ -20,6 +20,7 @@ import { eventPages } from "./entities/event_pages.js";
 import { eventPageWidgets } from "./entities/event_page_widgets.js";
 import { boothPages } from "./entities/booth_pages.js";
 import { boothPageWidgets } from "./entities/booth_page_widgets.js";
+import { eventAttendees } from "./entities/event_attendees.js";
 
 
 export {
@@ -49,5 +50,6 @@ export {
     eventPageWidgets,
     boothPages,
     boothPageWidgets,
+    eventAttendees,
     
 };

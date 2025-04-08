@@ -81,7 +81,7 @@ async function registerAsOrganizer(req) {
         display_name: req.display_name,
         contact_email: req.contact_email,
         phone_number: req.phone_number,
-        age: req.age
+        age: req.age || null,
     }).returning())[0];
     
     console.log("New user profile created:", newUserProfile);

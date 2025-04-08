@@ -99,6 +99,7 @@ export default function OrganizerEventManagePage() {
     const [contactInfo, setContactInfo] = useState("");
     const [eventId, setEventId] = useState(""); // Store the actual event_id
     const [isOwner, setIsOwner] = useState(true); // Track if the current user is the owner
+    const [eventAttendees, setEventAttendees] = useState([]); // Store event attendees
     
     // Banner state
     const [banner, setBanner] = useState(null); // File object for upload
@@ -499,6 +500,7 @@ export default function OrganizerEventManagePage() {
                 setContactInfo(data.content.contact_info || "");
                 setBooths(data.content.Booths || []); // Set booths from the event data
                 setEventId(data.content.event_id || ""); // Set the actual event_id
+                setEventAttendees(data.content.EventAttendees || []); // Set attendees from the event data
                 
                 // Set banner if available from API
                 if (data.content.banner) {
@@ -1135,6 +1137,24 @@ export default function OrganizerEventManagePage() {
                                     disabled={!isOwner}
                                 />
                             </div>
+
+                            {/* Event Attendees Count */}
+                            {eventIdName !== "create" && (
+                                <div className="mb-8">
+                                    <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">ผู้เข้าร่วมอีเวนต์</h2>
+                                    <div className="p-4 bg-blue-50 dark:bg-gray-700 rounded-lg flex items-center">
+                                        <div className="bg-blue-100 dark:bg-blue-800 p-3 rounded-full mr-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <span className="text-2xl font-bold text-blue-700 dark:text-blue-300">{eventAttendees.length}</span>
+                                            <p className="text-blue-600 dark:text-blue-300">ผู้เข้าร่วมทั้งหมด</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </form>
                         {/* Action Buttons - Aligned to the right with delete button on the left */}
                         <div className="flex justify-between mt-6 mb-4">
