@@ -3,6 +3,7 @@ import projectutility from "@/lib/projectutility";
 import Event from "@/lib/models/Event";
 import Organizer from "@/lib/models/Organizer";
 import User from "@/lib/models/User";
+import Page from "@/lib/models/Page";
 
 import { getConnection } from "@/lib/dbconnector";
 import { events, organizers, users } from "@/database/schema";
@@ -15,9 +16,14 @@ import { authOptions } from "@/lib/auth/next-auth-options";
 { message: "", content: {}, isSuccess: true }
 */
 
-export async function POST(req) {
+export async function POST(req, { params }) {
+    const param = await params;
+
+    const dbConnection = getConnection();
     
     try {
+        
+        const { eventIdName } = param;
         
         const session = await getServerSession(authOptions);
         
@@ -53,8 +59,18 @@ export async function POST(req) {
             );
         }
         
-        const requiredFields = ["event_id_name"];
+        const event = await Event.getEventByIdName(eventIdName);
+        if (!event) {
+            console.error("API ERROR: Event not found", eventIdName);
+            return NextResponse.json(
+                { message: "Event not found", isSuccess: false },
+                { status: 404 }
+            );
+        }
+        console.log("Event data:", event);
+        request_body.event = event.event_id;
         
+        const requiredFields = ["event"];
         for (const field of requiredFields) {
             if (!request_body[field]) {
                 console.error(`API ERROR: Missing required field: ${field}`);
@@ -64,24 +80,26 @@ export async function POST(req) {
                 );
             }
         }
+
         
-        const event = await Event.getEventByIdName(request_body.event_id_name);
-        if (!event) {
-            console.error("API ERROR: Event not found", request_body.event_id_name);
+        const page = await Page.updateEventPage({
+            event: request_body.event,
+            ...request_body
+
+        })
+
+        if (!page) {
+            console.error("API ERROR: Event Page not found", request_body.event_id_name);
             return NextResponse.json(
-                { message: "Event not found", isSuccess: false },
+                { message: "Event Page not found", isSuccess: false },
                 { status: 404 }
             );
         }
         
-        const organizer = await Organizer.getOrganizerByOrganizerId(event.organizer);
-        
-        event.isOwner = currentUser.user_id === organizer.owner;
-        
-        console.log("Event data:", event);
+        console.log("Event data:", page);
 
         return NextResponse.json(
-            { message: "Event retrieved successfully", content: event, isSuccess: true },
+            { message: "Event page retrieved successfully", content: page, isSuccess: true },
             { status: 200 }
         );
         

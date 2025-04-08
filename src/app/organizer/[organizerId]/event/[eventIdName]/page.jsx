@@ -1156,6 +1156,9 @@ export default function OrganizerEventManagePage() {
                                     <>
                                         <button 
                                             className="px-3 py-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition"
+                                            onClick={() =>
+                                                router.push(`/organizer/${organizerId}/event/${eventIdName}/page`)
+                                            }
                                         >
                                             ออกแบบหน้าเว็บ
                                         </button>

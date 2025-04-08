@@ -260,7 +260,9 @@ async function getEventByIdName(idName) {
         if (eventFromID) {
             return eventFromID;
         }
-    } catch (error) {}
+    } catch (error) {
+        console.log("Error fetching event by ID:", error);
+    }
 
     const eventQueryResult = await dbConnection
         .select()

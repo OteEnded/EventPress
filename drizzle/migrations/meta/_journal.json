@@ -134,6 +134,34 @@
       "when": 1744059242432,
       "tag": "0018_file_type_to_string",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1744074228920,
+      "tag": "0019_add_custom_page",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1744077383367,
+      "tag": "0020_chage_page_widget_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1744081252056,
+      "tag": "0021_fix_enum_typo",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1744081990457,
+      "tag": "0022_fix_enum_typo",
+      "breakpoints": true
     }
   ]
 }

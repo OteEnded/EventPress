@@ -1,7 +1,5 @@
 import { choiceSigninMethods } from "./enums/choice_signin_methods.js";
-import { choicePermissionTypes } from "./enums/choice_permission_types.js";
-import { choiceEventLayers } from "./enums/choice_event_layers.js";
-import { choiceFileTypes } from "./enums/choice_file_types.js";
+import { choiceWidgetTypes } from "./enums/choice_widget_types.js";
 
 import { lower } from "./functions.js"
 
@@ -18,14 +16,17 @@ import { activities } from "./entities/activities.js";
 import { systemAdmins } from "./entities/system_admins.js";
 import { staffTickets } from "./entities/staff_tickets.js";
 import { staffPermissions } from "./entities/staff_permissions.js";
+import { eventPages } from "./entities/event_pages.js";
+import { eventPageWidgets } from "./entities/event_page_widgets.js";
+import { boothPages } from "./entities/booth_pages.js";
+import { boothPageWidgets } from "./entities/booth_page_widgets.js";
+
 
 export {
     
     // Enums
-    // choiceFileTypes,
     choiceSigninMethods,
-    choicePermissionTypes,
-    choiceEventLayers,
+    choiceWidgetTypes,
     
     // Functions
     lower,
@@ -43,6 +44,10 @@ export {
     activities,
     systemAdmins,
     staffTickets,
-    staffPermissions
+    staffPermissions,
+    eventPages,
+    eventPageWidgets,
+    boothPages,
+    boothPageWidgets,
     
 };

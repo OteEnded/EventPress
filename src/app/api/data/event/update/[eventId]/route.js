@@ -119,15 +119,19 @@ export async function POST(req, { params }) {
         }
         if (request_body.start_date !== undefined) {
             eventData.start_date = request_body.start_date;
+            if (eventData.start_date == "") eventData.start_date = null
         }
         if (request_body.end_date !== undefined) {
             eventData.end_date = request_body.end_date;
+            if (eventData.end_date == "") eventData.end_date = null
         }
         if (request_body.start_time !== undefined) {
             eventData.start_time = request_body.start_time;
+            if (eventData.start_time == "") eventData.start_time = null
         }
         if (request_body.end_time !== undefined) {
             eventData.end_time = request_body.end_time;
+            if (eventData.end_time == "") eventData.end_time = null
         }
         if (request_body.capacity !== undefined) {
             eventData.capacity = request_body.capacity;

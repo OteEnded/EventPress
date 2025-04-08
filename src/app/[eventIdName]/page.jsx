@@ -1,14 +1,20 @@
+import Event from "@/lib/models/Event";
 
+import EventPageBuilder from "@/ui/pages/event";
 
 export default async function EventPage({ params }) {
     const param = await params;
     const event = await param.eventIdName;
+    
+    console.log("Event ID Name:", event);
+    
+    const eventData = await Event.getEventByIdName(event);
+    console.log("Event data:", eventData);
+    if (!eventData) {
+        return <div>Event not found</div>;
+    }
 
     return (
-        <div>
-            <h1>{event}</h1>
-            <p>Location: event_{event}_location</p>
-            <p>Date: event_{event}_date</p>
-        </div>
+        <EventPageBuilder event={eventData} /> // Pass the eventIdName prop to EventPage component
     );
 }

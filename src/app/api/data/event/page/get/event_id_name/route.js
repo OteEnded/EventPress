@@ -3,6 +3,7 @@ import projectutility from "@/lib/projectutility";
 import Event from "@/lib/models/Event";
 import Organizer from "@/lib/models/Organizer";
 import User from "@/lib/models/User";
+import Page from "@/lib/models/Page";
 
 import { getConnection } from "@/lib/dbconnector";
 import { events, organizers, users } from "@/database/schema";
@@ -54,7 +55,6 @@ export async function POST(req) {
         }
         
         const requiredFields = ["event_id_name"];
-        
         for (const field of requiredFields) {
             if (!request_body[field]) {
                 console.error(`API ERROR: Missing required field: ${field}`);
@@ -65,8 +65,8 @@ export async function POST(req) {
             }
         }
         
-        const event = await Event.getEventByIdName(request_body.event_id_name);
-        if (!event) {
+        const page = await Page.getPageOfEvent(request_body.event_id_name);
+        if (!page) {
             console.error("API ERROR: Event not found", request_body.event_id_name);
             return NextResponse.json(
                 { message: "Event not found", isSuccess: false },
@@ -74,14 +74,10 @@ export async function POST(req) {
             );
         }
         
-        const organizer = await Organizer.getOrganizerByOrganizerId(event.organizer);
-        
-        event.isOwner = currentUser.user_id === organizer.owner;
-        
-        console.log("Event data:", event);
+        console.log("Event data:", page);
 
         return NextResponse.json(
-            { message: "Event retrieved successfully", content: event, isSuccess: true },
+            { message: "Event page retrieved successfully", content: page, isSuccess: true },
             { status: 200 }
         );
         
