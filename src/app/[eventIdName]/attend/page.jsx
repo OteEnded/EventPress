@@ -13,6 +13,7 @@ export default function AttendEventPage() {
   // Form state
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -30,6 +31,15 @@ export default function AttendEventPage() {
     }
     if (!lastName.trim()) {
       setError("กรุณากรอกนามสกุล");
+      return false;
+    }
+    if (!email.trim()) {
+      setError("กรุณากรอกอีเมล");
+      return false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("กรุณากรอกอีเมลให้ถูกต้อง");
       return false;
     }
     if (!agreement) {
@@ -59,6 +69,7 @@ export default function AttendEventPage() {
           event: eventIdName,
           firstname: firstName,
           lastname: lastName,
+          email: email,
         }),
       });
 
@@ -74,6 +85,7 @@ export default function AttendEventPage() {
       // Clear form
       setFirstName("");
       setLastName("");
+      setEmail("");
       setAgreement(false);
       
       // Navigate back after 3 seconds
@@ -144,7 +156,7 @@ export default function AttendEventPage() {
             />
           </div>
           
-          <div className="mb-6">
+          <div className="mb-4">
             <label htmlFor="lastName" className="block mb-2 font-medium">
               นามสกุล
             </label>
@@ -158,6 +170,25 @@ export default function AttendEventPage() {
               disabled={isSubmitting}
               required
             />
+          </div>
+          
+          <div className="mb-6">
+            <label htmlFor="email" className="block mb-2 font-medium">
+              อีเมล
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+              placeholder="กรอกอีเมลของคุณ"
+              disabled={isSubmitting}
+              required
+            />
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+              อีเมลของคุณจะถูกใช้เพื่อส่งยืนยันการเข้าร่วมกิจกรรมและแจ้งเตือนเมื่อใกล้ถึงเวลากิจกรรม เราจะไม่ส่งโฆษณาหรือขายข้อมูลอีเมลของคุณให้กับบริษัทอื่น
+            </p>
           </div>
           
           {/* Terms & Agreement */}

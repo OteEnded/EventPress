@@ -392,8 +392,8 @@ export default function EventPageCustomize() {
         );
         setIsLoading(false);
 
-        // Start countdown for auto-refresh (15 seconds)
-        setErrorRefreshCountdown(15);
+        // Start countdown for auto-refresh (3 seconds)
+        setErrorRefreshCountdown(3);
       }
     }
 

@@ -51,6 +51,7 @@ package-lock.json
 # vscode
 .vscode
 .history
+tempCodeRunnerFile*
 
 # Other editors/IDEs
 .idea/

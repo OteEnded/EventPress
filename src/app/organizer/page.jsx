@@ -6,6 +6,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import RefreshButton from "@/ui/components/RefreshButton";
+import { cookies } from "next/headers";
 
 // This function sets cache control headers to prevent caching
 export const dynamic = 'force-dynamic';
@@ -23,6 +24,15 @@ export default async function OrganizerDashboardPage() {
 	}
 
 	const user = await User.getUserByIdentityEmail(session.user.email);
+	if (!user) {
+		console.error("API ERROR: Unauthorized access, user not found", session.user.email);
+		// remove session cookie and redirect to root
+		const cookieStore = cookies();
+		cookieStore.delete('next-auth.session-token');
+		cookieStore.delete('__Secure-next-auth.session-token');
+		cookieStore.delete('next-auth.callback-url');
+		cookieStore.delete('next-auth.csrf-token');
+	}
 	const event_of_user = await Event.getEventsOfUser(user.user_id);
 	
 	// Check if user is system admin

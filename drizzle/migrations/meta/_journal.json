@@ -176,6 +176,20 @@
       "when": 1744092044806,
       "tag": "0024_add_event_publish",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1744641769771,
+      "tag": "0025_add_email_to_event_attendee",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1744642789068,
+      "tag": "0026_remove_userprofiles_name",
+      "breakpoints": true
     }
   ]
 }

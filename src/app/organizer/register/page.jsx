@@ -25,7 +25,6 @@ export default function OrganizerRegisterPage() {
     const [lastname, setLastname] = useState("");
     const [displayName, setDisplayName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
-    const [age, setAge] = useState("");
     const [indentityEmail, setIndentityEmail] = useState("");
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -79,7 +78,6 @@ export default function OrganizerRegisterPage() {
                     lastname,
                     display_name: displayName,
                     phone_number: phoneNumber,
-                    age,
                 }),
             });
 
@@ -119,13 +117,6 @@ export default function OrganizerRegisterPage() {
             setError(error.message || "An error occurred while registering.");
         } finally {
             setIsSubmitting(false);
-        }
-    };
-
-    const handleAgeChange = (e) => {
-        const value = e.target.value;
-        if (value >= 0) {
-            setAge(value);
         }
     };
 
@@ -185,6 +176,7 @@ export default function OrganizerRegisterPage() {
                                         type="text"
                                         id="firstname"
                                         name="firstname"
+                                        placeholder="กรอกชื่อจริงของคุณ"
                                         className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500"
                                         required
                                         onChange={(e) => setFirstname(e.target.value)}
@@ -202,6 +194,7 @@ export default function OrganizerRegisterPage() {
                                         type="text"
                                         id="lastname"
                                         name="lastname"
+                                        placeholder="กรอกนามสกุลของคุณ"
                                         className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500"
                                         required
                                         onChange={(e) => setLastname(e.target.value)}
@@ -209,42 +202,21 @@ export default function OrganizerRegisterPage() {
                                 </div>
                             </div>
 
-                            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label
-                                        htmlFor="display_name"
-                                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                                    >
-                                        ชื่อที่ใช้แสดง
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="display_name"
-                                        name="display_name"
-                                        placeholder="ชื่อที่ต้องการให้แสดงในระบบ"
-                                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500"
-                                        onChange={(e) => setDisplayName(e.target.value)}
-                                    />
-                                </div>
-
-                                <div>
-                                    <label
-                                        htmlFor="age"
-                                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                                    >
-                                        อายุ
-                                    </label>
-                                    <input
-                                        type="number"
-                                        id="age"
-                                        name="age"
-                                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500"
-                                        onChange={handleAgeChange}
-                                        value={age}
-                                        min="0"
-                                        style={hideNumberInputSpinners}
-                                    />
-                                </div>
+                            <div className="mt-4">
+                                <label
+                                    htmlFor="display_name"
+                                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                >
+                                    ชื่อที่ใช้แสดง
+                                </label>
+                                <input
+                                    type="text"
+                                    id="display_name"
+                                    name="display_name"
+                                    placeholder="ชื่อที่ต้องการให้แสดงในระบบ"
+                                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500"
+                                    onChange={(e) => setDisplayName(e.target.value)}
+                                />
                             </div>
 
                             <div className="mt-4">

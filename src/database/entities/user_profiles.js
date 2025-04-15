@@ -8,7 +8,7 @@ export const userProfiles = pgTable("user_profiles", {
     lastname: text().notNull(),
     display_name: text(),
     contact_email: text(),
-    age: integer(),
+    // age: integer(),
     phone_number: text(10),
     created_at: timestamp().defaultNow(),
     updated_at: timestamp().defaultNow().$onUpdate(() => new Date()).notNull()

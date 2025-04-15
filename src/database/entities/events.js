@@ -2,7 +2,7 @@ import { pgTable, text, uuid, time, date, timestamp, real, uniqueIndex, boolean 
 import { sql } from "drizzle-orm";
 import { organizers } from "./organizers.js";
 import { files } from "./files.js";
-import { Table } from "drizzle-orm";
+
 // import { webPages } from "./web_pages.js";
 
 // 'cascade' | 'restrict' | 'no action' | 'set null' | 'set default';

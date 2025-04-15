@@ -14,7 +14,9 @@ async function getEventByEventId(eventId) {
         throw new Error("Event ID is required.");
     }
     if (!projectutility.isValidUUID(eventId)) {
-        throw new Error("Invalid Event ID format.");
+        console.error("Invalid Event ID format.");
+        return null;
+        // throw new Error("Invalid Event ID format.");
     }
 
     const eventQueryResult = await dbConnection

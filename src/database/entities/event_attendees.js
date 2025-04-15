@@ -8,6 +8,7 @@ export const eventAttendees = pgTable("event_attendees", {
     event: uuid().notNull().references(() => events.event_id, { onDelete: "cascade" }),
     firstname: text().notNull(),
     lastname: text().notNull(),
+    email: text().notNull(),
     
     created_at: timestamp().defaultNow(),
     updated_at: timestamp().defaultNow().$onUpdate(() => new Date())

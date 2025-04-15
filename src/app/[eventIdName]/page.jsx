@@ -2,6 +2,53 @@ import Event from "@/lib/models/Event";
 import EventPageBuilder from "@/ui/pages/event";
 import Link from "next/link";
 
+// Generate metadata for SEO
+export async function generateMetadata({ params }) {
+    const eventIdName = params.eventIdName;
+    const eventData = await Event.getEventByIdName(eventIdName);
+    
+    // If event doesn't exist or isn't published, return minimal metadata
+    if (!eventData || !eventData.published) {
+        return {
+            title: 'Event Not Found',
+            description: 'The event you are looking for does not exist or is not published yet.'
+        };
+    }
+    
+    // Default image path - replace with your default event image if needed
+    let imageUrl = '/images/default-event-banner.jpg';
+    
+    // If event has a banner, use it
+    if (eventData.banner) {
+        imageUrl = `/api/data/file/load?id=${eventData.banner}`;
+    }
+    
+    return {
+        title: eventData.name,
+        description: eventData.description || `Join us at ${eventData.name}`,
+        openGraph: {
+            title: eventData.name,
+            description: eventData.description || `Join us at ${eventData.name}`,
+            images: [
+                {
+                    url: imageUrl,
+                    width: 1200,
+                    height: 630,
+                    alt: eventData.name,
+                }
+            ],
+            locale: 'th_TH',
+            type: 'website',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: eventData.name,
+            description: eventData.description || `Join us at ${eventData.name}`,
+            images: [imageUrl],
+        },
+    };
+}
+
 export default async function EventPage({ params }) {
     const param = await params;
     const event = await param.eventIdName;
